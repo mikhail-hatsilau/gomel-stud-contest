@@ -1,108 +1,101 @@
-$main-background: #3f51b5
-$header-height: 60px
-$font: Arial
-$btns-color: #e91e63
-$list-divider-color: #e0e0e0
+@import node_modules/font-awesome/scss/font-awesome
+@import node_modules/muicss/lib/sass/mui-colors
+
+$mui-primary-color: mui-color('teal', '500')
+
+@import node_modules/muicss/lib/sass/mui
+
+$footer-height: 60px
+$content-padding: 20px
 
 html, body
   margin: 0
   padding: 0
-  font-family: $font
   height: 100%
 
 .wrapper
-  background-color: #e8eaf6
   min-height: 100%
-  padding-bottom: 60px
+  padding-bottom: 70px
   box-sizing: border-box
 
 .header
-  height: $header-height
-  line-height: 60px
-  box-shadow: 0 1px 10px black
-  background-color: $main-background
-
   .brand
-    font-size: 18px
-    color: white
-    display: inline-block
-    height: 100%
-    line-height: $header-height
-    padding: 0 20px
-    vertical-align: middle
+    color: $mui-appbar-font-color
     text-decoration: none
-  
-  ul
-    height: 100%
-    line-height: $header-height
+    display: inline-block
+    padding: 0 20px
+    font-size: 20px
+    vertical-align: middle
+
+  >ul
     list-style: none
     display: inline-block
     vertical-align: middle
-    padding: 0
-    
-    li
-      float: left
-
-      a
+    >li
+      float: left 
+      >a
+        color: $mui-appbar-font-color
         text-decoration: none
-        color: white
+        display: inline-block
         padding: 0 20px
-        text-align: center
 
 .content
   padding: 20px
 
-.content.editor-page
-  position: absolute
-  left: 0
-  right: 0
-  top: $header-height
-  bottom: 60px
+.wrapper.editor-page
+  height: 1px
 
-  .bar,
-  .bar>div,
-  iframe
+  .content
     height: 100%
+    box-sizing: border-box
+    position: relative
 
-.container
-  background-color: white
-  box-shadow: 0 1px 5px black
+.footer
+  height: 60px
+  margin-top: -61px
+  background-color: #e0e0e0
+  border-top: 1px solid #bdbdbd
+  line-height: 60px
+  padding-left: 20px
+  font-size: 12px
+
+.bar>div,
+iframe
   height: 100%
-  padding: 10px
-  box-sizing: border-box
 
 .bar
-  position: relative
+  position: absolute
+  top: $content-padding
+  bottom: 70px
+  left: $content-padding
+  right: $content-padding
 
 .clearfix:after
   content: " "
   display: table
   clear: both
 
-.footer
-  height: 60px
-  background-color: #e0e0e0
-  border-top: 1px solid #bdbdbd
-  line-height: 60px
-  padding-left: 20px
-  font-size: 12px
-  margin-top: -61px
 
 iframe
   width: 100%
 
-#editorHtml, #editorCss iframe
+.editor, iframe
   overflow: auto
 
-#editorHtml, #editorCss
+.editor
   height: 50%
 
-#editorHtml
+.editor:first-of-type
   border-bottom: 1px solid rgba(0, 0, 0, 0.3)
   box-sizing: border-box
 
+.editor:only-child
+  height: 100%
+  border: none
+
 ul
   margin: 0
+  padding: 0
 
 .horizontal-divider
   position: absolute
@@ -146,9 +139,17 @@ ul
 .right
   float: right
 
+.left
+  float: left
+
 .next-task[disabled]
   opacity: 0.5
   cursor: default
+
+.to-do-block
+  position: fixed
+  bottom: 0
+  right: 0
 
 //****Popup****
 .popup-overlay
@@ -186,7 +187,7 @@ ul
   position: absolute
   bottom: 10px
   right: 10px
-  background-color: $btns-color
+  background-color: black
   color: white
   box-shadow: 0 1px 8px black
   border: none
@@ -197,32 +198,12 @@ ul
   border-radius: 50%
   cursor: pointer
 
-//****Users page****
-.student, .list-header
-  width: 100%
-  border-bottom: 1px solid $list-divider-color
-  padding: 10px
-  box-sizing: border-box
+.remove-btn, .edit-btn
+  background: transparent
+  border: none
 
-  &:last-child
-    border-bottom: none
-
-  >div
-    float: left
-
-  .username
-    width: 30%
-  .first-name
-    width: 20%
-  .last-name
-    width: 20%
-  .role
-    width: 20%
-  .remove
-    width: 10%
-
-.list-header
-  font-weight: bold
+a.edit-btn
+  color: black
 
 //***Quiz board****
 .participants-list
@@ -231,16 +212,10 @@ ul
   tr
     transition: background-color 1s
 
+.selector-length
+  margin-left: 10px
+
 //***end quiz board****
-
-.results-table
-  width: 100%
-  border-collapse: collapse
-  table-layout: fixed
-
-  th, td
-    text-align: left
-    border-bottom: 1px solid $list-divider-color
 
 //***Common results page***
 .total-results
@@ -250,3 +225,122 @@ ul
 
 .total-results-first-step
   margin-bottom: 20px
+
+// Popup
+.ui-widget-overlay
+  background-color: rgba(0, 0, 0, 0.8)
+
+.ui-dialog, .ui-dialog-titlebar, .ui-dialog-buttonpane
+  background-color: white
+  border: none
+  border-radius: 0
+  padding: 0
+
+.ui-widget-content, .ui-dialog-titlebar
+  color: black
+
+.ui-dialog .ui-dialog-titlebar-close
+  display: none
+
+.ui-dialog
+  .ui-dialog-content
+    overflow: visible
+
+  .ui-dialog-buttonset
+    button
+      background: none
+      color: $mui-primary-color
+      border-radius: 0
+      border: none
+      text-transform: uppercase
+
+.popup-actions
+  text-align: right
+  button
+    color: $mui-primary-color
+
+#removeConfirmationDialog
+  >div
+    display: inline-block
+
+  .icon
+    color: $mui-primary-color
+    margin-right: 10px
+
+// Edit tasks page
+.task-info
+  .common-info, .code-editor
+    width: 50%
+    float: left
+    height: 350px
+
+.code-editor
+  height: 500px
+  position: relative
+
+  .bar
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+// end edit tasks page
+
+.mui-table
+  table-layout: fixed
+
+// Quiz results page
+.scrollable-table
+  border-right: 1px solid $mui-divider-color
+  overflow-x: auto
+  overflow-y: visible
+  .mui-table
+    tr
+      th, td
+        border: 1px solid $mui-divider-color
+
+      th
+        width: 500px
+        padding: 0 10px
+
+        &:last-child
+          border-right: none
+          width: 200px
+
+        &:first-child
+          width: 300px
+
+        &:not(:first-child):not(:last-child)
+          padding: 0
+
+        >div
+          text-align: center
+          height: 50%
+          margin-right: -1px
+
+          &:first-child
+            border-bottom: 1px solid $mui-divider-color
+
+          div
+            display: inline-block
+            width: 25%
+            border-right: 1px solid $mui-divider-color
+
+            &:last-child
+              border-right: none
+
+      td
+        &:last-child
+          border-right: none
+
+  .first-step
+    tr
+      th
+        >div
+          div
+            width: 50%
+
+  .total-results
+    tr
+      th
+        width: auto
+        min-width: 100px

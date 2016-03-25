@@ -5,8 +5,12 @@ co = require 'co'
 USERS_TABLE = 'Users'
 QUIZ_TABLE = "Quiz"
 ROLES_TABLE = "Roles"
-RESULTS_TABLE = "Results"
+MARKS_TABLE = "Marks"
+TASKS_TABLE = "Tasks"
 FIRST_STEP_TABLE = "FirstStep"
+
+FIRST_STEP_ID = 1
+QUIZ_STEP_ID = 2
 
 options = config.get('dbConfig')
 connection = null
@@ -19,7 +23,8 @@ module.exports.getUser = (username) ->
   connection.query QUERY, [username]
 
 module.exports.getUserById = (id) ->
-  QUERY = "SELECT username, firstName, lastName, role FROM #{USERS_TABLE} WHERE id=?;"
+  QUERY = "SELECT #{USERS_TABLE}.id, username, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " + 
+  "FROM #{USERS_TABLE} INNER JOIN #{ROLES_TABLE} ON role = #{ROLES_TABLE}.id AND #{USERS_TABLE}.id = ?;"
   connection.query QUERY, [id]
 
 module.exports.getRole = (id) ->
@@ -40,8 +45,8 @@ module.exports.getParticipants = ->
 
 module.exports.saveQuizResults = (result, id) ->
   co ->
-    QUERY = "INSERT INTO #{QUIZ_TABLE} (stud_id, task, length, time) VALUE (?,?,?,?)"
-    yield connection.query QUERY, [id, result.task, result.selectorLength, result.time]
+    QUERY = "INSERT INTO #{QUIZ_TABLE} (stud_id, task, time, selector) VALUE (?,?,?,?);"
+    yield connection.query QUERY, [id, result.taskId, result.time, result.selector]
 
 module.exports.getRoles = ->
   QUERY = "SELECT * FROM #{ROLES_TABLE};"
@@ -56,46 +61,100 @@ module.exports.removeUser = (id) ->
   connection.query QUERY, [id]
 
 module.exports.quizResults = ->
-  QUERY = "SELECT #{USERS_TABLE}.username, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, #{QUIZ_TABLE}.task, #{QUIZ_TABLE}.length, " +
-  "#{QUIZ_TABLE}.time " +
-  "FROM #{USERS_TABLE} LEFT JOIN #{QUIZ_TABLE} ON #{QUIZ_TABLE}.stud_id=#{USERS_TABLE}.id " +
-  "WHERE #{USERS_TABLE}.role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
+  QUERY = "SELECT #{QUIZ_TABLE}.stud_id, #{QUIZ_TABLE}.task, " +
+  "#{QUIZ_TABLE}.time, #{QUIZ_TABLE}.selector " +
+  "FROM #{QUIZ_TABLE};"
   connection.query QUERY
 
 module.exports.firstStepResults = ->
-  QUERY = "SELECT #{USERS_TABLE}.id, #{USERS_TABLE}.username, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, #{FIRST_STEP_TABLE}.task, " +
-  "#{FIRST_STEP_TABLE}.time " + 
-  "FROM #{USERS_TABLE} LEFT JOIN #{FIRST_STEP_TABLE} ON #{USERS_TABLE}.id = #{FIRST_STEP_TABLE}.user_id " +
-  "WHERE #{USERS_TABLE}.role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
+  QUERY = "SELECT * FROM #{FIRST_STEP_TABLE};"
   connection.query QUERY
 
-module.exports.commonResults = (step) ->
-  QUERY = "SELECT #{USERS_TABLE}.id as userId, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, " + 
-  "#{RESULTS_TABLE}.task, #{RESULTS_TABLE}.mark " + 
-  "FROM #{USERS_TABLE} LEFT JOIN #{RESULTS_TABLE} ON #{USERS_TABLE}.id=#{RESULTS_TABLE}.user_id AND #{RESULTS_TABLE}.step = ? " +
-  "WHERE #{USERS_TABLE}.role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
-  connection.query QUERY, [step]
+module.exports.commonResults = (userId) ->
+  # QUERY = "SELECT #{USERS_TABLE}.id as userId, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, " + 
+  # "#{MARKS_TABLE}.task, #{MARKS_TABLE}.mark " + 
+  # "FROM #{USERS_TABLE} LEFT JOIN #{MARKS_TABLE} ON #{USERS_TABLE}.id=#{MARKS_TABLE}.user_id AND #{MARKS_TABLE}.step = ? " +
+  # "WHERE #{USERS_TABLE}.role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
+  QUERY = "SELECT * FROM #{MARKS_TABLE} WHERE user_id = ?"
+  connection.query QUERY, [userId]
 
-module.exports.getUserResults = (userId, step, task) ->
-  QUERY = "SELECT * FROM #{RESULTS_TABLE} WHERE user_id = ? AND step = ? AND task = ?;"
-  connection.query QUERY, [userId, step, task]
+module.exports.getUserResults = (userId, taskId) ->
+  QUERY = "SELECT * FROM #{MARKS_TABLE} WHERE user_id = ? AND task_id = ?;"
+  connection.query QUERY, [userId, taskId]
 
-module.exports.changeResultOfCurrentUser = (userId, step, task, value) ->
-  QUERY = "UPDATE #{RESULTS_TABLE} SET mark = ? WHERE user_id = ? AND step = ? AND task = ?;"
-  connection.query QUERY, [value, userId, step, task]
+module.exports.changeResultOfCurrentUser = (userId, taskId, value) ->
+  QUERY = "UPDATE #{MARKS_TABLE} SET mark = ? WHERE user_id = ? AND task_id = ?;"
+  connection.query QUERY, [value, userId, taskId]
 
-module.exports.createResultForUser = (userId, step, task, value) ->
-  QUERY = "INSERT INTO #{RESULTS_TABLE} (user_id, step, task, mark) VALUE (?,?,?,?);"
-  connection.query QUERY, [userId, step, task, value]
+module.exports.createResultForUser = (userId, taskId, value) ->
+  QUERY = "INSERT INTO #{MARKS_TABLE} (user_id, task_id, mark) VALUE (?,?,?);"
+  connection.query QUERY, [userId, taskId, value]
 
 module.exports.clearQuizResults = ->
   QUERY = "DELETE FROM #{QUIZ_TABLE};"
   co ->
     yield connection.query QUERY
 
-module.exports.saveFirstStepResults = (userId, taskNumber, time) ->
-  QUERY = "INSERT INTO #{FIRST_STEP_TABLE} (user_id, task, time) VALUE (?,?,?);"
-  connection.query QUERY, [userId, taskNumber, time]
+module.exports.saveFirstStepResults = (userId, taskId, time, htmlCode, cssCode, path) ->
+  QUERY = "INSERT INTO #{FIRST_STEP_TABLE} (user_id, task, time, htmlCode, cssCode, path) VALUE (?,?,?,?,?,?);"
+  connection.query QUERY, [userId, taskId, time, htmlCode, cssCode, path]
+
+module.exports.getFirstStepTaskResults = (userId, taskNumber) ->
+  QUERY = "SELECT user_id, task, htmlCode, cssCode, path FROM #{FIRST_STEP_TABLE} " +
+  "WHERE user_id = ? AND task = ?;"
+  connection.query QUERY, [userId, taskNumber]
+
+module.exports.updateActiveState = (userId, active) ->
+  QUERY = "UPDATE #{USERS_TABLE} SET active = ? WHERE id = ?;"
+  connection.query QUERY, [active, userId]
+
+module.exports.updateUser = (userId, username, firstName, lastName, roleId) ->
+  QUERY = "UPDATE #{USERS_TABLE} SET username = ?, firstName = ?, lastName = ?, role = ? WHERE id = ?;"
+  connection.query QUERY, [username, firstName, lastName, roleId, userId]
+
+module.exports.getTasks = (stepId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE step_id = ?;"
+  connection.query QUERY, [stepId]
+
+module.exports.getAllTasks = ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE};"
+  connection.query QUERY
+
+module.exports.addFirstStepTask = (taskName, displayNumber, weight, htmlCode, cssCode, toDo) ->
+  QUERY = "INSERT INTO #{TASKS_TABLE} (name, displayNumber, weight, step_id, htmlCode, cssCode, toDo) " +
+  "VALUE(?,?,?,#{FIRST_STEP_ID},?,?,?);"
+  connection.query QUERY, [taskName, displayNumber, weight, htmlCode, cssCode, toDo]
+
+module.exports.addQuizStepTask = (taskName, displayNumber, weight, answares, deprecatedSelectors, htmlCode) ->
+  QUERY = "INSERT INTO #{TASKS_TABLE} (name, displayNumber, weight, step_id, htmlCode, answares, deprecatedSelectors) " +
+  "VALUE(?,?,?,#{QUIZ_STEP_ID},?,?,?);"
+  connection.query QUERY, [taskName, displayNumber, weight, htmlCode, answares, deprecatedSelectors]
+
+module.exports.getTask = (taskId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
+  connection.query QUERY, [taskId]
+
+module.exports.getTaskByDisplayNumber = (displayNumber, stepId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE displayNumber = ? AND step_id = ?;"
+  connection.query QUERY, [displayNumber, stepId]
+
+module.exports.updateFirstStepTask = (taskId, name, displayNumber, weight, htmlCode, cssCode, toDo) ->
+  QUERY = "UPDATE #{TASKS_TABLE} SET name = ?, displayNumber = ?, weight = ?, htmlCode = ?, cssCode = ?, toDo = ? " +
+  "WHERE id = ?;"
+  connection.query QUERY, [name, displayNumber, weight, htmlCode, cssCode, toDo, taskId]
+
+module.exports.updateQuizStepTask = (taskId, name, displayNumber, weight, answares, deprecatedSelectors, htmlCode) ->
+  QUERY = "UPDATE #{TASKS_TABLE} SET name = ?, displayNumber = ?, weight = ?, answares = ?, deprecatedSelectors = ?, htmlCode = ? " +
+  "WHERE id = ?;"
+  connection.query QUERY, [name, displayNumber, weight, answares, deprecatedSelectors, htmlCode, taskId]
+
+module.exports.removeTask = (taskId) ->
+  QUERY = "DELETE FROM #{TASKS_TABLE} WHERE id = ?;"
+  connection.query QUERY, [taskId]
+
+module.exports.activateTask = (taskId, active) ->
+  QUERY = "UPDATE #{TASKS_TABLE} SET active = ? WHERE id = ?;"
+  connection.query QUERY, [active, taskId]
 
 module.exports.closeConnection = ->
   connection.end()

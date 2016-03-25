@@ -1,6 +1,9 @@
+$ = require('jquery');
+
 $(function (){
 
 	var taskNumber = parseInt(localStorage.getItem('quizTaskNumber')) || 1;
+	var taskId;
 	var rootNode;
 	var startTime;
 	var intervalId;
@@ -105,12 +108,13 @@ $(function (){
 				location.href = '/results'
 			})
 			.fail(function(){
-				console.log('Error while finishing task')
+				console.log('Error occured')
 			});
 		}
 
-		$.get("cssTests/tasks/task-" + num + ".task", function (data) {
+		$.get("/quizTasks/" + num, function (data) {
 			localStorage.setItem('quizTaskNumber', taskNumber);
+			taskId = data.taskId;
 			showHtmlBlock();
 			setTimeout(function (){
 				startTime = new Date();
@@ -128,14 +132,14 @@ $(function (){
 			}, 500);
 			forbiddenFlag = true;
 			$('.html-code').html("");
-			var lines = data.split("\n");
-			var firstLine = lines.splice(0, 1)[0].split('\\');
-			var needed = firstLine[0].split(",").map(Number);
-			forbidden = firstLine[1].split(' ');
+			var lines = data.htmlCode.split("\n");
+			var needed = data.answares.split(",").map(Number);
+			console.log(data.deprecatedSelectors.split(' '));
+			forbidden = data.deprecatedSelectors.split(' ');
 
-			$('.forbidden .data').html(firstLine[1]);
+			$('.forbidden .data').html(data.deprecatedSelectors);
 			rootNode = $("<div/>");
-			rootNode.append($(lines.join("\n")));
+			rootNode.append(data.htmlCode);
 			$(rootNode).find('*').each(function (index){
 				$(this).attr('data-csstest-row', index);
 			});
@@ -169,9 +173,10 @@ $(function (){
 				console.log(time);
 				clearInterval(intervalId);
 				socketIo.emit('pass test', {
-					task: taskNumber,
-					selectorLength: selector.length,
-					time: time
+					taskId: taskId,
+					taskNumber: taskNumber,
+					time: time,
+					selector: selector
 				});
 				return true;
 			} else {

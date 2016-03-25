@@ -1,0 +1,19 @@
+extends ./layout/layout
+
+block content
+  .bar.clearfix
+    .editors
+      .editor#htmlEditor
+        | #{taskInfo.htmlCode}
+      .horizontal-divider
+      .editor#cssEditor
+        | #{taskInfo.cssCode}
+    .vertical-divider
+    .results
+      iframe(
+        frameborder="0",
+        sandbox="allow-forms allow-same-origin allow-scripts"
+        src="#{taskInfo.path}"
+      )
+block scripts
+  script(src='/scripts/adminEditor.js')

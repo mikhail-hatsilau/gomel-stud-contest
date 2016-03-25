@@ -1,5 +1,6 @@
 utils = require '../utils'
 db = require '../database'
+FirstStepTask = require '../models/firstStepTask'
 
 module.exports.get = (next) ->
   if this.session.passedQuiz
@@ -7,26 +8,42 @@ module.exports.get = (next) ->
   yield this.render 'editor', { editorPage: true }
 
 module.exports.save = (next) ->
-  taskNumber = this.request.body.task
+  taskId = this.request.body.taskId
   time = this.request.body.time / 1000
+  htmlCode = this.request.body.htmlCode
+  cssCode = this.request.body.cssCode
 
-  yield db.saveFirstStepResults this.session.user.id, taskNumber, time
+  pathToFile = utils.getFilePath this.session.user.id, this.session.user.username, taskId
+  yield db.saveFirstStepResults this.session.user.id, taskId, time, htmlCode, cssCode, pathToFile
 
   this.body = {
     status: 'ok'
   }
 
 module.exports.next = (next) ->
+  FIRST_STEP_ID = 1
   taskNumber = parseInt this.params.task
 
-  task = utils.readTaskFile taskNumber
+  resp = yield db.getTaskByDisplayNumber taskNumber, FIRST_STEP_ID
+  rows = resp[0]
 
-  if task is null
+  if not rows.length
     this.throw 'No such task', 404
 
-  nextTaskExists = utils.checkFileExists taskNumber + 1
+  task = new FirstStepTask(
+    rows[0].id,
+    rows[0].name,
+    rows[0].displayNumber,
+    rows[0].weight,
+    rows[0].htmlCode,
+    rows[0].cssCode,
+    rows[0].toDo
+  )
+
+  resp = yield db.getTaskByDisplayNumber taskNumber + 1, FIRST_STEP_ID
+  rows = resp[0]
 
   this.body = {
     task: task
-    next: nextTaskExists
+    next: !!rows.length
   }

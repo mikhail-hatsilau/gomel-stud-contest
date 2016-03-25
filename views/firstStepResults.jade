@@ -1,42 +1,36 @@
 extends ./layout/layout
 
 block content
-  h3 CSS Quiz results
+  h3 First step results
   .scrollable-table
-    table.mui-table.mui-table--bordered
+    table.mui-table.mui-table--bordered.first-step
       thead
         tr
           th Participant
           each task in allTasks
-            th(colspan="4")
+            th(colspan=2)
               div= task.name
               div
-                div(data-sort-col="0") Weight
+                div Time
                   button.js-sort Sort
-                div(data-sort-col="1") Time
-                  button.js-sort Sort
-                div Selector
-                div(data-sort-col="3") Length
-                  button.js-sort Sort
-              //- button.js-sort Sort
+                div Result file
           th Total
             button.js-sort Sort
       tbody
         each user in users
           tr(data-id=user.id)
-            td= user.firstName + ' ' + user.lastName
+            td #{user.firstName} #{user.lastName}
             - var totalTime = 0
             each task in allTasks
               if user.tasks[task.id]
                 - totalTime += user.tasks[task.id].time
-                td= user.tasks[task.id].task.weight
                 td= user.tasks[task.id].time
-                td= user.tasks[task.id].selector
-                td= user.tasks[task.id].selector.length
+                td
+                  a(href="/saveFile/#{user.id}/#{task.id}") Download
+                  a(href="/showMarkup/#{user.id}/#{task.id}/") Show
               else
-                td
-                td
                 td
                 td
             td
               span.sort-item= totalTime
+

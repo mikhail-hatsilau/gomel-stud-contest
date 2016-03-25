@@ -1,11 +1,5 @@
 extends ./layout/layout.jade
 
-block title
-  title Login
-
-block header
-  a.brand(href="/") Login
-
 block content
   form.sign-in(action="/login" method="POST")
     div
@@ -14,6 +8,3 @@ block content
       input(type="password", name="password", placeholder="password")
     input(type="submit", value="Sign in")
     .server-error
-
-block scripts
-  script(src='scripts/main.js')

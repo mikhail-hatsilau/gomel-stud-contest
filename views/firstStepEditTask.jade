@@ -1,0 +1,34 @@
+extends ./layout/layout
+
+block content
+  form.firststep-task-edit-form(action="/saveFirstStepTask/#{task.id ? task.id : ''}")
+    .actions-section
+      button.mui-btn.mui-btn--primary(type="submit") Save
+    .common-info
+      .mui-textfield
+        input(type="text", name="name", value=task.name ? task.name : '', required)
+        label Name of task
+      .mui-textfield
+        input(type="text", name="displayNumber", value=task.displayNumber ? task.displayNumber : '', required)
+        label Display number
+      .mui-textfield
+        input(type="text", name="weight", value=task.weight ? task.weight : '', required)
+        label Weight of task
+      .mui-textfield
+        textarea(name="theTask", required)= task.toDo ? task.toDo : ''
+        label To do
+    .code-editor
+      .bar
+        .editors
+          .editor#htmlEditor #{task.htmlCode}
+          .horizontal-divider
+          .editor#cssEditor #{task.cssCode}
+        .vertical-divider
+        .results
+          iframe(
+            frameborder="0",
+            sandbox="allow-forms allow-same-origin allow-scripts"
+          )
+
+block scripts
+  script(src='/scripts/adminEditor.js')

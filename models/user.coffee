@@ -1,7 +1,7 @@
 utils = require '../utils'
 
 class User
-  constructor: (@id, @username, @firstName, @lastName, @role) ->
+  constructor: (@id, @username, @firstName, @lastName, @active, @role) ->
 
   @checkPassword: (passwordFromDb, password) ->
     encryptedPassword = utils.encryptPass password

@@ -20,13 +20,15 @@ module.exports.post = (next) ->
 
   if rows.length
     if User.checkPassword rows[0].password, password
-      console.log rows[0].role
-      resp = yield db.getRole(rows[0].role)
-      roleRows = resp[0]
-      role = new Role roleRows[0].id, roleRows[0].name
-      user = new User(rows[0].id, rows[0].username, rows[0].firstName, rows[0].lastName, role)
-      this.session.user = user
-      this.body = {}
+      if rows[0].active
+        resp = yield db.getRole(rows[0].role)
+        roleRows = resp[0]
+        role = new Role roleRows[0].id, roleRows[0].name
+        user = new User rows[0].id, rows[0].username, rows[0].firstName, rows[0].lastName, rows[0].active, role
+        this.session.user = user
+        this.body = {}
+      else
+        sendLoginError.apply this, [403, 'The account is not active!']
     else
       sendLoginError.apply this, [403, 'Wrong password!']
   else

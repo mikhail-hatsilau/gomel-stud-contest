@@ -1,36 +1,58 @@
 db = require '../database'
 _ = require 'lodash'
 utils = require '../utils'
+User = require '../models/user'
+Role = require '../models/role'
+QuizStepTask = require '../models/quizStepTask'
 
 module.exports = (next) ->
+  QUIZ_STEP_ID = 2
   resp = yield db.quizResults()
   rows = resp[0]
 
   users = []
 
   for row in rows
-    userIndex = _.findIndex users, { username: row.username }
+    index = _.findIndex(users, { id: row.stud_id })
+    if index is -1
+      resp = yield db.getUserById row.stud_id
+      usersRows = resp[0]
+      role = new Role usersRows[0].roleId, usersRows[0].roleName
+      user = new User usersRows[0].id, usersRows[0].username, usersRows[0].firstName, usersRows[0].lastName, usersRows[0].active, role
+      user.tasks = {}
+      users.push user
+    else
+      user = users[index]
 
-    if userIndex is -1
-      tasksTime = {}
-      tasksSelector = {}
-      tasksTime[row.task] = row.time
-      tasksSelector[row.task] = row.length
-      users.push {
-        username: row.username,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        tasksTime: if row.task is null then {} else tasksTime,
-        tasksSelectorLength: if row.task is null then {} else tasksSelector,
-        totalTime: row.time
-      }
-      continue
+    resp = yield db.getTask row.task
+    tasksRows = resp[0]
+    task = new QuizStepTask(
+      tasksRows[0].id,
+      tasksRows[0].name,
+      tasksRows[0].displayNumber,
+      tasksRows[0].weight,
+      tasksRows[0].answares,
+      tasksRows[0].deprecatedSelectors,
+      tasksRows[0].htmlCode
+    )
 
-    users[userIndex].totalTime += row.time
-    users[userIndex].tasksTime[row.task] = row.time
-    users[userIndex].tasksSelectorLength[row.task] = row.length
+    taskInfo = {}
+    taskInfo.task = task
+    taskInfo.time = row.time
+    taskInfo.selector = row.selector
+
+    user.tasks[task.id] = taskInfo
+
+  resp = yield db.getTasks QUIZ_STEP_ID
+  rows = resp[0]
+
+  allTasks = rows.map (element) ->
+    {
+      id: element.id,
+      name: element.name
+    }
 
   yield this.render 'quizResults', {
     users: users,
-    countOfTasks: utils.getCountOfQuizTasks()
+    allTasks: allTasks
   }

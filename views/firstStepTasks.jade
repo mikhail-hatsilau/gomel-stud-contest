@@ -1,0 +1,30 @@
+extends ./layout/layout
+
+block content
+  a.mui-btn.mui-btn--primary.add-new-task(href="/addFirstStepTask") Add
+  table.mui-table.mui-table--bordered.tasks-list
+    thead
+      tr
+        th Id
+        th Name
+        th Display number
+        th Weight
+        th Active
+        th
+    tbody
+      each task in tasks
+        tr(data-id=task.id)
+          td= task.id
+          td= task.name
+          td= task.displayNumber
+          td= task.weight
+          td
+            input.active-task(type="checkbox", name="active", value=task.active, autocomplete="off", checked=task.active ? true : false)
+          td
+            a.edit-btn(href="/editFirstStepTask/#{task.id}")
+              i.fa.fa-pencil-square-o
+            button.remove-btn.remove-task
+              i.fa.fa-trash
+
+  #removeConfirmationDialog
+    include ./includes/removeConfirmationPopup.jade

@@ -1,0 +1,15 @@
+form.edit-user(action="/editUser", method="POST")
+  div.mui-textfield
+    input.edit-username(type="text", name="username", required)
+    label Username
+  div.mui-textfield
+    input.edit-firstname(type="text", name="firstName", required)
+    label First name
+  div.mui-textfield
+    input.edit-lastname(type="text", name="lastName", required)
+    label Last name
+  div.mui-select
+    select.roles(name="role")
+  input.user-id(type="hidden", name="userId")
+  input.edit-active(type="hidden", name="active")
+

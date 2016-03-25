@@ -1,4 +1,12 @@
+$ = require 'jquery'
+ace = require 'brace'
+_ = require 'lodash'
+require 'brace/mode/html'
+require 'brace/mode/css'
+require('./dividers')()
+
 codeRunner = $('.js-run')
+editor = $('.editor')
 startTime = 0
 
 editorHtml = ace.edit 'editorHtml'
@@ -13,32 +21,54 @@ setLocalStorage = (key, value) ->
 getLocalStorage = (key) ->
   localStorage.getItem key
 
+clearLocalStorageItem = (key) ->
+  localStorage.removeItem key
+
+taskId = -1
 taskNumber = getLocalStorage('taskNumber') || 1
+
+savePage = ->
+  $.ajax({
+    url: "/save/",
+    method: 'POST',
+    data: {
+      htmlContent: editorHtml.getValue(),
+      cssContent: editorCss.getValue(),
+      taskId: taskId
+    }
+  }).done (resp) ->
+    jsResult = $('.js-result')
+    jsResult.load ->
+      form = $(this).contents().find 'form'
+      form.on 'submit', (event) ->
+        submitFrameForm.call this, $(this).attr 'action'
+        event.preventDefault()
+        event.stopImmediatePropagation()
+
+    setLocalStorage 'htmlCode', editorHtml.getValue()
+    setLocalStorage 'cssCode', editorCss.getValue()
+
+    jsResult.attr 'src', resp.filePath
+
+editorHtml.on 'change', _.debounce(savePage, 2000)
+editorCss.on 'change', _.debounce(savePage, 2000)
+
 
 # Fills editors and popup with new task information
 showTask = (task) ->
-  editorHtml.setValue task.html, -1
-  editorCss.setValue task.css, -1
-  taskPopup = $('.task-popup')
-  taskPopup.empty()
-  taskPopup.html task.text
-  codeRunner.trigger 'click'
+  console.log task
+  htmlCode = getLocalStorage('htmlCode') || task.htmlCode
+  cssCode = getLocalStorage('cssCode') || task.cssCode
+  editorHtml.setValue htmlCode, -1
+  editorCss.setValue cssCode, -1
+  toDoBlock = $('.to-do-block')
+  toDoBlock.empty()
+  toDoBlock.html task.toDo
   $('.js-result').attr 'src', ''
   startTime = new Date().getTime()
 
 # Loads new task from the server
-loadTask = (nextTaskExists) ->
-
-  nextTaskExists = typeof(nextTaskExists) is 'undefined' ? true : nextTaskExists
-
-  parseFile = (data) ->
-    blocks = data.split '*'
-    {
-      html: blocks[0],
-      css: blocks[1],
-      text: blocks[2]
-    }
-
+loadTask = ->
   $.get "/next/#{taskNumber}"
     .done (resp) ->
       nextTaskBtn = $('.next-task')
@@ -49,18 +79,30 @@ loadTask = (nextTaskExists) ->
         nextTaskBtn.hide()
 
       setLocalStorage 'taskNumber', taskNumber
-      task = parseFile(resp.task)
+
+      taskId = resp.task.id
+
+      task =
+        htmlCode: resp.task.htmlCode
+        cssCode: resp.task.cssCode
+        toDo: resp.task.toDo
       showTask(task)
+    .fail () ->
+      console.log arguments
 
 saveTaskResults = () ->
   time = new Date().getTime() - startTime
 
   $.post '/saveTaskResults', { 
-    task: taskNumber,
-    time: time
+    taskId: taskId,
+    time: time,
+    htmlCode: editorHtml.getValue(),
+    cssCode: editorCss.getValue()
   }
     .done ->
       taskNumber++
+      clearLocalStorageItem 'htmlCode'
+      clearLocalStorageItem 'cssCode'
       loadTask()
     .error ->
       console.log 'Error while saving task results'
@@ -97,105 +139,13 @@ loadTask()
 $('.next-task').on 'click', ->
   saveTaskResults()
 
-# Run written code inside the editor
-codeRunner.on 'click', ->
-  $.ajax({
-    url: "/save/",
-    method: 'POST',
-    data: {
-      htmlContent: editorHtml.getValue(),
-      cssContent: editorCss.getValue(),
-      taskNumber: taskNumber
-    }
-  }).done (resp) ->
-    jsResult = $('.js-result')
-    jsResult.load ->
-      form = $(this).contents().find 'form'
-      form.on 'submit', (event) ->
-        submitFrameForm.call this, $(this).attr 'action'
-        event.preventDefault()
-        event.stopImmediatePropagation()
-
-    jsResult.attr 'src', resp.filePath
+editor.on 'editorResize', ->
+  editorHtml.resize()
+  editorCss.resize()
 
 socketIo.on 'start quiz', ->
   startQuiz()
 
-bar = $('.bar')
-editorHtmlDomElement = $('#editorHtml')
-editorCssDomElement = $('#editorCss')
-MIN_SIZE = 5
-editorsBlock = $('.editors')
-resultsBlock = $('.results')
 
-$('.horizontal-divider')
-  .mousedown (event) ->
-    that = this
-    startY = event.pageY
-    startPosition = $(this).position()
-    editorsHeight = editorsBlock.height()
-    editorHtmlHeight = editorHtmlDomElement.height() * 100 / editorsHeight
-    editorCssHeight = editorCssDomElement.height() * 100 / editorsHeight
-    $(document).mouseup (event) ->
-
-      $(this).off 'mousemove'
-      $(this).off 'mouseup'
-
-    $(document).mousemove (event) ->
-      offset = event.pageY - startY
-      offsetPer = offset * 100 / editorsHeight
-
-      newHeightHtmlEditor = editorHtmlHeight + offsetPer
-      newHeightCssEditor = editorCssHeight - offsetPer
-
-      if newHeightHtmlEditor <= MIN_SIZE or newHeightCssEditor <= MIN_SIZE
-        return
-
-      editorHtmlDomElement.css('height', newHeightHtmlEditor + '%')
-      editorCssDomElement.css('height', newHeightCssEditor + '%')
-
-      newTopPosition = startPosition.top * 100 / editorsHeight + offsetPer
-
-      $(that).css('top', newTopPosition + '%')
-
-      editorHtml.resize()
-      editorCss.resize()
-        
-
-$('.vertical-divider')
-  .mousedown (event) ->
-    that = this
-    startX = event.pageX
-    startPosition = $(this).position()
-    barWidth = bar.width()
-    editorsBlockWidth = editorsBlock.width() * 100 / barWidth
-    resultsBlockWidth = resultsBlock.width() * 100 / barWidth
-    $overlayer = $('<div>').addClass 'overlayer'
-    resultsBlock.append $overlayer
-
-    $(document).mouseup (event) ->
-      $(this).off 'mousemove'
-      $(this).off 'mouseup'
-
-      $overlayer.remove()
-
-    $(document).mousemove (event) ->
-      offset = event.pageX - startX
-      offsetPer = offset * 100 / barWidth
-      newEditorsWidth = editorsBlockWidth + offsetPer
-      newResultsWidth = resultsBlockWidth - offsetPer
-
-      if newEditorsWidth <= MIN_SIZE or newResultsWidth <= MIN_SIZE
-        return
-
-      resultsBlock.css('width', newResultsWidth + '%')
-      editorsBlock.css('width', newEditorsWidth + '%')
-
-      newLeftPosition = startPosition.left * 100 / barWidth + offsetPer
-
-      $(that).css('left', newLeftPosition + '%')
-
-      editorHtml.resize()
-      editorCss.resize()
 
 

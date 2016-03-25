@@ -3,6 +3,8 @@ jade = require 'gulp-jade'
 sass = require 'gulp-sass'
 coffee = require 'gulp-coffee'
 server = require 'gulp-develop-server'
+browserify = require 'gulp-browserify'
+rename = require 'gulp-rename'
 
 DEST = './dist/'
 
@@ -16,32 +18,43 @@ gulp.task 'sass', ->
     .pipe sass()
     .pipe gulp.dest DEST
 
-gulp.task 'coffee', ->
-  gulp.src './src/**/*.coffee'
-    .pipe coffee()
+gulp.task 'scripts', ->
+  gulp.src './src/**/*.coffee', { read: false }
+    .pipe browserify({
+        transform: ['coffeeify'],
+        extensions: ['.js', '.coffee']
+    })
+    .pipe rename((path) ->
+      path.extname = '.js'
+    )
     .pipe gulp.dest DEST
+
+  gulp.src './src/cssTests/script/*.js', { read: false }
+    .pipe browserify({
+        extensions: ['.js']
+    })
+    .pipe rename((path) ->
+      path.extname = '.js'
+    )
+    .pipe gulp.dest DEST + '/cssTests/script/'
 
 gulp.task 'server:start', ->
   server.listen {path: './server.coffee'}
 
-gulp.task 'copy-libs', ->
-  gulp.src './node_modules/jquery/dist/jquery.js'
-    .pipe gulp.dest DEST + 'scripts/lib/'
-  gulp.src './node_modules/lodash/**/*'
-    .pipe gulp.dest DEST + 'scripts/lib/lodash/'
-
-gulp.task 'copy-quiz', ->
-  gulp.src './src/cssTests/**/*'
-    .pipe gulp.dest DEST + '/cssTests/'
-
-gulp.task 'copy-tasks', ->
+gulp.task 'copy', ->
+  gulp.src './src/cssTests/css/*'
+    .pipe gulp.dest DEST + 'cssTests/css'
+  gulp.src './node_modules/font-awesome/fonts/*'
+    .pipe gulp.dest DEST + 'fonts/'
   gulp.src './src/tasks/*'
-    .pipe gulp.dest DEST + '/tasks/'
+    .pipe gulp.dest DEST + 'tasks/'
+    gulp.src './node_modules/jquery-ui/themes/vader/jquery-ui.min.css*'
+    .pipe gulp.dest DEST + 'styles/lib/'
 
 gulp.task 'watch', ->
   gulp.watch './src/**/*.jade', ['jade']
   gulp.watch './src/**/*.sass', ['sass']
-  gulp.watch './src/**/*.coffee', ['coffee']
+  gulp.watch './src/**/*.coffee', ['scripts']
   gulp.watch './server.coffee', server.restart
 
-gulp.task 'default', ['jade', 'sass', 'coffee', 'copy-libs', 'copy-quiz', 'copy-tasks', 'server:start', 'watch']
+gulp.task 'default', ['jade', 'sass', 'scripts', 'copy', 'server:start', 'watch']
