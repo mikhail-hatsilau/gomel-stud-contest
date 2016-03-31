@@ -1,5 +1,8 @@
 extends ./layout/layout
 
+block title
+  title Edit step 1 task
+
 block content
   form.firststep-task-edit-form(action="/saveFirstStepTask/#{task.id ? task.id : ''}")
     .actions-section

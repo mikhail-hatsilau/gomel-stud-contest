@@ -123,4 +123,9 @@ html, body {
 
 .data {
 	font-weight: bold;
+	transition: color 0.5s;
+}
+
+.red-color {
+	color: red;
 }

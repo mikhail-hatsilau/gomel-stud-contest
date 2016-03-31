@@ -1,5 +1,8 @@
 extends ./layout/layout
 
+block title
+  title Edit step 2 task
+
 block content
   form.quiz-task-edit-form(action="/saveQuizStepTask/#{task.id ? task.id : ''}")
     .actions-section

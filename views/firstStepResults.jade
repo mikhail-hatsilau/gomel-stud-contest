@@ -1,5 +1,8 @@
 extends ./layout/layout
 
+block title
+  title Step 1 results
+
 block content
   h3 First step results
   .scrollable-table
@@ -7,14 +10,16 @@ block content
       thead
         tr
           th Participant
+          - var colNumber = 0
           each task in allTasks
             th(colspan=2)
               div= task.name
               div
-                div Time
+                div(data-col= 2 * colNumber + 1) Time
                   button.js-sort Sort
                 div Result file
-          th Total
+            - colNumber++
+          th(data-col= 2 * colNumber + 1) Total
             button.js-sort Sort
       tbody
         each user in users
@@ -24,10 +29,11 @@ block content
             each task in allTasks
               if user.tasks[task.id]
                 - totalTime += user.tasks[task.id].time
-                td= user.tasks[task.id].time
                 td
-                  a(href="/saveFile/#{user.id}/#{task.id}") Download
-                  a(href="/showMarkup/#{user.id}/#{task.id}/") Show
+                  span.sort-item= user.tasks[task.id].time
+                td
+                  a.load-file(href="/saveFile/#{user.id}/#{task.id}") Download
+                  a.show(href="/showMarkup/#{user.id}/#{task.id}/") Show
               else
                 td
                 td

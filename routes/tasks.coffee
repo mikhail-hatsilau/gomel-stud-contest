@@ -20,7 +20,7 @@ module.exports.getQuizTasks = (next) ->
   rows = resp[0]
   tasks = []
   for row in rows
-    task = new QuizStepTask row.id, row.name, row.displayNumber, row.weight, row.answares, row.deprecatedSelectors, row.htmlCode
+    task = new QuizStepTask row.id, row.name, row.displayNumber, row.weight, row.answares, row.deprecatedSelectors, row.htmlCode, row.active
     tasks.push task
 
   yield this.render 'quizStepTasks', { tasks: tasks }
@@ -47,7 +47,7 @@ module.exports.editQuizStepTask = (next) ->
   rows = resp[0]
   if not rows.length
     this.throw 'No such task', 404
-  task = new QuizStepTask rows[0].id, rows[0].name, rows[0].displayNumber, rows[0].weight, rows[0].answares, rows[0].deprecatedSelectors, rows[0].htmlCode
+  task = new QuizStepTask rows[0].id, rows[0].name, rows[0].displayNumber, rows[0].weight, rows[0].answares, rows[0].deprecatedSelectors, rows[0].htmlCode, rows[0].active
   console.log task
   yield this.render 'quizStepEditTask', { task: task }
 
@@ -68,13 +68,13 @@ module.exports.saveFirstStepTask = (next) ->
     task: task
 
 module.exports.saveQuizStepTask = (next) ->
-  console.log this.request.body
   taskName = this.request.body.taskName
   displayNumber = this.request.body.displayNumber
   weight = this.request.body.weight
   answares = this.request.body.answares
   htmlCode = this.request.body.htmlCode
   deprecatedSelectors = this.request.body.deprecatedSelectors
+  active = true
 
   resp = yield db.addQuizStepTask(taskName, displayNumber, weight, answares, deprecatedSelectors, htmlCode)
 

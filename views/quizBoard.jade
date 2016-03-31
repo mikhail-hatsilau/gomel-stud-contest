@@ -1,8 +1,22 @@
 extends ./layout/layout
 
+block title
+  title Quiz board
+
 block content
-  button.start-quiz-btn Start quiz
-  table.mui-table.mui-table--bordered.participants-list(data-count=allTasks.length)
+  .quiz-task-time.mui-textfield
+    input(type="text", value=120, placeholder='Seconds')
+    label Limit time (Seconds)
+
+  .actions
+    button.mui-btn.mui-btn--primary.init-quiz Init
+    button.mui-btn.mui-btn--primary.start-quiz-btn Start quiz
+    button.mui-btn.mui-btn--primary.next-quiz-task Next
+
+  .current-task Current task:
+    span
+
+  table.mui-table.mui-table--bordered.participants-list
     thead
       tr
         th Participant
@@ -10,3 +24,9 @@ block content
           th= task.name
         th Total time
     tbody
+      each user in users
+        tr(data-id= user.id)
+          td= user.firstName + ' ' + user.lastName
+          each task in allTasks
+            td(data-taskid=task.id)
+          td.total

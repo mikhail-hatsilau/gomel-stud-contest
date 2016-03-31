@@ -275,13 +275,39 @@ activateUser = ->
 $('.ativate-user').on 'click', (event) ->
  activateUser.call this
 
+allTasks = undefined
 # Quiz board page. Start quiz button (Admin). Sends start event to the server
 $('.start-quiz-btn').on 'click', ->
+  timeLimit = $('.quiz-task-time').find('input').val()
   that = this
-  socketIo.emit 'begin', null, ->
-    $(that).hide()
+  socketIo.emit 'begin', timeLimit, (tasks) ->
+    $(that).hide() 
+    allTasks = tasks
+    if not allTasks.length
+      return
+    task = allTasks.shift()
+    $('.current-task').find('span').text task.name
+    $('.next-quiz-task').show()
 
-# saveResults function sends ajax for saving results.
+$('.next-quiz-task').on 'click', ->
+  timeLimit = $('.quiz-task-time').find('input').val()
+  task = allTasks.shift()
+
+  socketIo.emit 'next task', {
+    timeLimit: timeLimit,
+    taskId: task.id
+  }
+
+  if allTasks
+    $('.current-task').find('span').text task.name
+
+  if not allTasks.length
+    $(this).hide()
+
+$('.init-quiz').on 'click', (event) ->
+  socketIo.emit 'init quiz'
+
+# saveResults function sends ajax for saving marks.
 # Also it hides inputs, shows spans and calculates total
 saveResults = (parent) ->
   editElement = $(parent).find 'input'
@@ -304,10 +330,9 @@ saveResults = (parent) ->
       .fail ->
         console.log 'Error occured while saving results'
   textElement.text value
-  debugger
-  totalTextElementStep1 = participant.find '.step1-sum'
-  totalTextElementStep2 = participant.find '.step2-sum'
-  totalMarkElement = participant.find '.total-mark'
+  totalTextElementStep1 = participant.find('.step1-sum').find 'span'
+  totalTextElementStep2 = participant.find('.step2-sum').find 'span'
+  totalMarkElement = participant.find('.total-mark').find 'span'
   elementsWithMarkStep1 = participant.find('.step1-task').find('span')
   elementsWithMarkStep2 = participant.find('.step2-task').find('span')
   console.log participant
@@ -342,20 +367,20 @@ $('.js-mark').on 'click', editMarkCallback
 # Result sorting
 $('.js-sort').on 'click', (event) ->
   ascendingOrder = (a, b) ->
-    sortColumnA = $(a).find('td')[taskNumber]
-    sortColumnB = $(b).find('td')[taskNumber]
+    sortColumnA = $(a).find('td')[colNumber]
+    sortColumnB = $(b).find('td')[colNumber]
     +$(sortColumnA).find('.sort-item').text() - (+$(sortColumnB).find('.sort-item').text())
 
   descendingOrder = (a, b) ->
-    sortColumnA = $(a).find('td')[taskNumber]
-    sortColumnB = $(b).find('td')[taskNumber]
+    sortColumnA = $(a).find('td')[colNumber]
+    sortColumnB = $(b).find('td')[colNumber]
     +$(sortColumnB).find('.sort-item').text() - (+$(sortColumnA).find('.sort-item').text())
 
-  taskNumber = +$(this).parent().data 'col'
+  colNumber = +$(this).parent().data 'col'
   sorted = $(this).parent().data('sorted') || false 
   table = $(this).parents 'table'
   rows = table.find('tbody').find 'tr'
-
+  rows.detach()
   if sorted
     rows.sort descendingOrder
     $(this).parent().data 'sorted', false
@@ -363,8 +388,7 @@ $('.js-sort').on 'click', (event) ->
     rows.sort ascendingOrder
     $(this).parent().data 'sorted', true
 
-  table.find('tbody').empty().append rows
-  $('.js-step-results').on 'click', editMarkCallback
+  table.find('tbody').append rows
 
 removeTask = (item, url) ->
   $.post url, {
@@ -406,6 +430,38 @@ $('.active-task').on 'click', (event) ->
     .fail ->
       console.log 'Error occured'
 
+# $('.save-settings').find('input[type="checkbox"]').on 'click', (event) ->
+#   state = $(this).prop 'checked'
+#   parentBlock = $(this).parents 'div'
+#   if state
+#     parentBlock.next().show()
+#     parentBlock.next().find('input').prop 'required', true
+#   else
+#     parentBlock.next().hide()
+#     parentBlock.next().find('input').prop 'required', false
+
+# Drag block with task
+# $('.to-do-block').on 'mousedown', (event) ->
+#   self = this
+#   startX = event.pageX
+#   startY = event.pageY
+#   currentPosition.left = currentPosition.left + (event.pageX - currentPosition.left)
+#   currentPosition.top = currentPosition.top + (event.pageY - currentPosition.top)
+#   $(document).on 'mousemove', (event) ->
+#     x = event.pageX
+#     y = event.pageY
+
+#     $(self).css {
+#       'left': currentPosition.left + (x - currentPosition.left),
+#       'top': currentPosition.top + (y - currentPosition.top)
+#     }
+
+#   $(document).on 'mouseup', ->
+#     console.log 'mouseup'
+#     $(document).unbind 'mousemove'
+#     $(document).unbind 'mouseup'
+
+
 # Parse seconds according to the format (mm:ss)
 parseTime = (time) ->
   minutes = parseInt time / 60
@@ -423,54 +479,76 @@ convertTimeToSeconds = (time) ->
 
 # Event from the server. When user is ready to start quiz this function adds
 # user to the list of ready users
-socketIo.on 'add user', (user) ->
-  participantsTable = $('.participants-list')
-  participantsList = participantsTable.find 'tbody'
-  participant = $('<tr class="participant" data-id=' + user.id + ' />')
-  participant.append $('<td />').text(user.firstName + ' ' + user.lastName)
-  i = 0
-  while i < participantsTable.data 'count'
-    participant.append $('<td />')
-    i++
-  participant.append $('<td class="total" />')
-  participant.appendTo participantsList
+# socketIo.on 'add user', (user) ->
+#   participantsTable = $('.participants-list')
+#   participantsList = participantsTable.find 'tbody'
+#   participant = $('<tr class="participant" data-id=' + user.id + ' />')
+#   participant.append $('<td />').text(user.firstName + ' ' + user.lastName)
+#   i = 0
+#   while i < participantsTable.data 'count'
+#     participant.append $('<td />')
+#     i++
+#   participant.append $('<td class="total" />')
+#   participant.appendTo participantsList
 
 # Event from the server. When user passes one test of the quiz this function is called
 # and adds results to the list
 socketIo.on 'test passed', (data) ->
+  FAIL_SYMBOL = '--'
   user = data.user
   participantsList = $('.participants-list').find 'tbody'
   participantsRows = participantsList.find 'tr'
   participant = participantsList.find 'tr[data-id=' + user.id + ']'
   columns = participant.find('td').toArray()
-  console.log typeof columns
-  console.log columns
-  task = $(columns[data.taskNumber])
+  task = participant.find "td[data-taskid= #{data.taskId}]"
   time = $('<span class="time"/>')
   selectorLength = $('<span class="selector-length"/>')
-  time.text parseTime(data.time)
-  selectorLength.text data.selector.length
+
+  if not data.passed
+    time.text '--'
+    time.data 'limit', data.time
+    selectorLength.text ''
+    participant.css 'background-color', '#f44336'
+    setTimeout( ->
+      participant.css 'background-color', ''
+    , 500)
+  else
+    time.text parseTime(data.time)
+    selectorLength.text data.selector.length
+    participant.css 'background-color', '#b2ff59'
+    setTimeout( ->
+      participant.css 'background-color', ''
+    , 500)
+
   task.append(time).append(selectorLength)
 
   columns.splice(0, 1)
   columns.splice(-1, 1)
 
   totalTime = columns.reduce((sum, current)->
-    sum += convertTimeToSeconds($(current).find('.time').text())
+    timeCell = $(current).find('.time')
+    if timeCell.text() is FAIL_SYMBOL
+      sum += +timeCell.data 'limit'
+    else
+      sum += convertTimeToSeconds(timeCell.text())
   , 0)
 
   participant.find('.total').text parseTime(totalTime)
 
-  participant.css 'background-color', '#b2ff59'
-  setTimeout( ->
-    participant.css 'background-color', ''
-  , 500)
-
   participantsRows.sort (a, b) ->
     totalTimeA = $(a).find '.total'
     totalTimeB = $(b).find '.total'
-    console.log convertTimeToSeconds(totalTimeA.text())
-    console.log convertTimeToSeconds(totalTimeB.text())
     convertTimeToSeconds(totalTimeA.text()) - convertTimeToSeconds(totalTimeB.text())
 
   participantsRows.detach().appendTo participantsList
+
+socketIo.on 'init', ->
+  console.log 'init'
+  localStorage.removeItem 'quizTime'
+  location.replace '/readyQuiz'
+
+socketIo.on 'next', (data) ->
+  localStorage.setItem 'timeLimit', data.time
+  localStorage.setItem 'quizTaskId', data.taskId
+  localStorage.removeItem 'quizTime'
+  location.replace '/quiz'

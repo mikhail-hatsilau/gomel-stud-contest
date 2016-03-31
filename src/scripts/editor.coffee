@@ -7,7 +7,8 @@ require('./dividers')()
 
 codeRunner = $('.js-run')
 editor = $('.editor')
-startTime = 0
+time = 0
+intervalId = undefined
 
 editorHtml = ace.edit 'editorHtml'
 editorHtml.getSession().setMode 'ace/mode/html'
@@ -65,7 +66,12 @@ showTask = (task) ->
   toDoBlock.empty()
   toDoBlock.html task.toDo
   $('.js-result').attr 'src', ''
-  startTime = new Date().getTime()
+  time = getLocalStorage('firstStepStartTime') || 0
+  timer = $('.timer')
+  intervalId = setInterval(->
+    setLocalStorage 'firstStepStartTime', ++time
+    timer.text parseTime(time)
+  , 1000)
 
 # Loads new task from the server
 loadTask = ->
@@ -87,12 +93,12 @@ loadTask = ->
         cssCode: resp.task.cssCode
         toDo: resp.task.toDo
       showTask(task)
-    .fail () ->
-      console.log arguments
+    .fail (xhr) ->
+      taskNumber--
+      if xhr.status is 403
+        alert xhr.responseJSON.message
 
 saveTaskResults = () ->
-  time = new Date().getTime() - startTime
-
   $.post '/saveTaskResults', { 
     taskId: taskId,
     time: time,
@@ -103,13 +109,24 @@ saveTaskResults = () ->
       taskNumber++
       clearLocalStorageItem 'htmlCode'
       clearLocalStorageItem 'cssCode'
+      clearLocalStorageItem 'firstStepStartTime'
+      clearInterval intervalId
       loadTask()
     .error ->
       console.log 'Error while saving task results'
 
 startQuiz = ->
-  localStorage.removeItem 'taskNumber'
+  clearLocalStorageItem 'taskNumber'
   location.href = '/quiz'
+
+parseTime = (time) ->
+  minutes = parseInt time / 60
+  seconds = time - minutes * 60
+
+  if minutes < 10 then stringMinutes = "0#{minutes}" else stringMinutes = minutes
+  if seconds < 10 then stringSeconds = "0#{seconds}" else stringSeconds = seconds
+
+  stringMinutes + ':' + stringSeconds
 
 # Submitting user's form inside the frame
 submitFrameForm = (action) ->
@@ -120,12 +137,16 @@ submitFrameForm = (action) ->
     data: $(this).serialize()
   }
     .done (resp) ->
-      QUIZ_ROUTE = '/quiz'
-      body = $(that).parent 'body'
-      body.empty()
-      body.append resp
-      saveTaskResults()
-      socketIo.emit 'ready to start'
+      # QUIZ_ROUTE = '/quiz'
+      # body = $(that).parent 'body'
+      # contentBlock = $('<div class="frame-info"/>')
+      # contentBlock.append $('<div class="message"/>').text(resp.message)
+      # contentBlock.append $('<div class="timer"/>')
+      # body.empty()
+      # body.append contentBlock
+      # saveTaskResults()
+      # socketIo.emit 'ready to start'
+      location.href = '/readyQuiz'
 
     .error (xhr) ->
       $(that).find('.error').remove()
@@ -142,10 +163,6 @@ $('.next-task').on 'click', ->
 editor.on 'editorResize', ->
   editorHtml.resize()
   editorCss.resize()
-
-socketIo.on 'start quiz', ->
-  startQuiz()
-
 
 
 

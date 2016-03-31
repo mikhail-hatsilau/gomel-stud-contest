@@ -1,5 +1,8 @@
 extends ./layout/layout
 
+block title
+  title Quiz results
+
 block content
   h3 CSS Quiz results
   .scrollable-table
@@ -7,19 +10,19 @@ block content
       thead
         tr
           th Participant
+          - var colNumber = 0
           each task in allTasks
             th(colspan="4")
               div= task.name
               div
-                div(data-sort-col="0") Weight
+                div(data-col= ++colNumber) Weight
                   button.js-sort Sort
-                div(data-sort-col="1") Time
+                div(data-col= ++colNumber) Time
                   button.js-sort Sort
-                div Selector
-                div(data-sort-col="3") Length
+                div(data-col= ++colNumber) Selector
+                div(data-col= ++colNumber) Length
                   button.js-sort Sort
-              //- button.js-sort Sort
-          th Total
+          th(data-col= ++colNumber) Total
             button.js-sort Sort
       tbody
         each user in users
@@ -29,10 +32,13 @@ block content
             each task in allTasks
               if user.tasks[task.id]
                 - totalTime += user.tasks[task.id].time
-                td= user.tasks[task.id].task.weight
-                td= user.tasks[task.id].time
+                td
+                  span.sort-item= user.tasks[task.id].task.weight
+                td
+                  span.sort-item= user.tasks[task.id].time
                 td= user.tasks[task.id].selector
-                td= user.tasks[task.id].selector.length
+                td
+                  span.sort-item= user.tasks[task.id].selector.length
               else
                 td
                 td

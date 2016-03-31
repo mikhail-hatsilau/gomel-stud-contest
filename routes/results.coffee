@@ -4,14 +4,11 @@ Role = require '../models/role'
 FirstStepTask = require '../models/firstStepTask'
 QuizStepTask = require '../models/quizStepTask'
 
-module.exports = (next) ->
-  yield this.render 'results'
-
 module.exports.total = (next) ->
   FIRST_STEP_ID = 1
   QUIZ_STEP_ID = 2
 
-  resp = yield db.getAllUsers()
+  resp = yield db.getAllStudents()
   rows = resp[0]
 
   users = []
@@ -71,7 +68,12 @@ module.exports.total = (next) ->
     )
     tasks.step2.push task
 
-  console.log tasks.step1[0]
+  tasks.step1.sort (a, b) ->
+    a.displayNumber - b.displayNumber
+
+  tasks.step2.sort (a, b) ->
+    a.displayNumber - b.displayNumber
+
   yield this.render 'total', {
     users: users,
     tasks: tasks 

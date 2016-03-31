@@ -79,17 +79,17 @@ iframe
 iframe
   width: 100%
 
-.editor, iframe
+div.editor, iframe
   overflow: auto
-
-.editor
+  
+div.editor
   height: 50%
 
-.editor:first-of-type
+div.editor:first-of-type
   border-bottom: 1px solid rgba(0, 0, 0, 0.3)
   box-sizing: border-box
 
-.editor:only-child
+div.editor:only-child
   height: 100%
   border: none
 
@@ -142,40 +142,21 @@ ul
 .left
   float: left
 
-.next-task[disabled]
-  opacity: 0.5
-  cursor: default
+.next-task
+  position: absolute
+  bottom: 10px
+  right: 10px
 
 .to-do-block
   position: fixed
-  bottom: 0
-  right: 0
+  left: 20px
+  bottom: 75px
+  background: rgba(0, 0, 0, 0.5)
+  z-index: 5
+  color: white
+  padding: 20px
 
 //****Popup****
-.popup-overlay
-  visibility: hidden
-  position: fixed
-  top: 0
-  bottom: 0
-  left: 0
-  right: 0
-  background-color: rgba(0, 0, 0, 0.6)
-  text-align: center
-  z-index: 4
-  transition: visibility 0.5s
-
-  &:after
-    content: " "
-    height: 100%
-    display: inline-block
-    vertical-align: middle
-
-.popup
-  background-color: white
-  display: inline-block
-  vertical-align: middle
-  opacity: 0
-  transition: opacity 1s
 
 .task-popup
   height: 200px
@@ -184,9 +165,6 @@ ul
 //****End popup****
 
 .round-btn
-  position: absolute
-  bottom: 10px
-  right: 10px
   background-color: black
   color: white
   box-shadow: 0 1px 8px black
@@ -214,6 +192,13 @@ a.edit-btn
 
 .selector-length
   margin-left: 10px
+
+.next-quiz-task
+  display: none
+
+.current-task
+  span
+    margin-left: 5px
 
 //***end quiz board****
 
@@ -342,5 +327,24 @@ a.edit-btn
   .total-results
     tr
       th
-        width: auto
-        min-width: 100px
+        width: 150px
+
+        &:first-child
+          width: 400px
+
+      td
+        input
+          display: inline-block
+          width: 100%
+
+// Settings page
+.mui-textfield.hide-block
+  display: none
+
+.save-settings 
+  h3
+    border-bottom: 1px solid $mui-divider-color
+
+.load-file
+  margin-right: 10px
+

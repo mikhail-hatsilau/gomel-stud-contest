@@ -33,7 +33,8 @@ module.exports = (next) ->
       tasksRows[0].weight,
       tasksRows[0].answares,
       tasksRows[0].deprecatedSelectors,
-      tasksRows[0].htmlCode
+      tasksRows[0].htmlCode,
+      tasksRows[0].active,
     )
 
     taskInfo = {}

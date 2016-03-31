@@ -39,6 +39,11 @@ module.exports.getAllUsers = ->
   QUERY = "SELECT * FROM #{USERS_TABLE};"
   connection.query QUERY
 
+module.exports.getAllStudents = ->
+  QUERY = "SELECT * FROM #{USERS_TABLE} WHERE role = " +
+  "(SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
+  connection.query QUERY
+
 module.exports.getParticipants = ->
   QUERY = "SELECT * FROM #{USERS_TABLE} WHERE role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
   connection.query QUERY
@@ -65,6 +70,10 @@ module.exports.quizResults = ->
   "#{QUIZ_TABLE}.time, #{QUIZ_TABLE}.selector " +
   "FROM #{QUIZ_TABLE};"
   connection.query QUERY
+
+module.exports.quizResultsOfStudent = (taskId, userId) ->
+  QUERY = "SELECT * FROM #{QUIZ_TABLE} WHERE stud_id = ? AND task = ?;"
+  connection.query QUERY, [userId, taskId]
 
 module.exports.firstStepResults = ->
   QUERY = "SELECT * FROM #{FIRST_STEP_TABLE};"
@@ -116,6 +125,15 @@ module.exports.getTasks = (stepId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE step_id = ?;"
   connection.query QUERY, [stepId]
 
+module.exports.getActiveTasks = (stepId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE step_id = ? AND active = true;"
+  connection.query QUERY, [stepId]
+
+module.exports.getActiveTasksPromise = (stepId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE step_id = ? AND active = true;"
+  co ->
+    yield connection.query QUERY, [stepId]
+
 module.exports.getAllTasks = ->
   QUERY = "SELECT * FROM #{TASKS_TABLE};"
   connection.query QUERY
@@ -138,6 +156,10 @@ module.exports.getTaskByDisplayNumber = (displayNumber, stepId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE displayNumber = ? AND step_id = ?;"
   connection.query QUERY, [displayNumber, stepId]
 
+module.exports.getTaskById = (taskId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
+  connection.query QUERY, [taskId]
+
 module.exports.updateFirstStepTask = (taskId, name, displayNumber, weight, htmlCode, cssCode, toDo) ->
   QUERY = "UPDATE #{TASKS_TABLE} SET name = ?, displayNumber = ?, weight = ?, htmlCode = ?, cssCode = ?, toDo = ? " +
   "WHERE id = ?;"
@@ -155,6 +177,23 @@ module.exports.removeTask = (taskId) ->
 module.exports.activateTask = (taskId, active) ->
   QUERY = "UPDATE #{TASKS_TABLE} SET active = ? WHERE id = ?;"
   connection.query QUERY, [active, taskId]
+
+# module.exports.getSettings = ->
+#   QUERY = "SELECT * FROM #{SETTINGS_TABLE};"
+#   connection.query QUERY
+
+# module.exports.getSettingsByName = (name) ->
+#   QUERY = "SELECT * FROM #{SETTINGS_TABLE} WHERE name = ?;"
+#   connection.query QUERY, [name]
+
+# module.exports.getSettingsByNameWithPromise = (name) ->
+#   QUERY = "SELECT * FROM #{SETTINGS_TABLE} WHERE name = ?;"
+#   co ->
+#     yield connection.query QUERY, [name]
+
+# module.exports.updateSettings = (name, value, active) ->
+#   QUERY = "UPDATE #{SETTINGS_TABLE} SET value = ?, active = ? WHERE name = ?;"
+#   connection.query QUERY, [value, active, name]
 
 module.exports.closeConnection = ->
   connection.end()

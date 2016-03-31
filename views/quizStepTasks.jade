@@ -1,8 +1,11 @@
 extends ./layout/layout
 
+block title
+  title Quiz tasks
+
 block content
   a.mui-btn.mui-btn--primary.add-new-task(href="/addQuizStepTask") Add
-  table.mui-table.mui-table--bordered.tasks-list(data-type="quizTasks")     
+  table.mui-table.mui-table--bordered.tasks-list
     thead
       tr
         th Id
@@ -11,6 +14,7 @@ block content
         th Weight
         th Answare
         th Deprecated selectors
+        th Active
         th
     tbody
       each task in tasks
@@ -21,6 +25,8 @@ block content
           td= task.weight
           td= task.answares
           td= task.deprecatedSelectors
+          td
+            input.active-task(type="checkbox", name="active", value=task.active, autocomplete="off", checked=task.active ? true : false)
           td
             a.edit-btn(href="/editQuizStepTask/#{task.id}")
               i.fa.fa-pencil-square-o

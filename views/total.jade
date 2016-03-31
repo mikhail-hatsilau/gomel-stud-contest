@@ -1,17 +1,26 @@
 extends ./layout/layout
 
+block title
+  title Total results
+
 block content
   .scrollable-table
     table.mui-table.mui-table--bordered.total-results
       thead
         th Participant
+        -var colNumber = 0
         each task in tasks.step1
-          th Step1.#{task.name}
-        th Step1
+          th(data-col= ++colNumber) Step1.#{task.name}
+            button.js-sort Sort
+        th(data-col= ++colNumber) Step1
+          button.js-sort Sort
         each task in tasks.step2
-          th Step2.#{task.name}
-        th Step2
-        th Total
+          th(data-col= ++colNumber) Step2.#{task.name}
+            button.js-sort Sort
+        th(data-col= ++colNumber) Step2
+          button.js-sort Sort
+        th(data-col= ++colNumber) Total
+          button.js-sort Sort
       tbody
         each user in users
           tr(data-id=user.id)
@@ -21,19 +30,22 @@ block content
               if user.tasksMarks[task.id]
                 -totalMarkStep1 += user.tasksMarks[task.id]
                 td.step1-task.js-mark(data-taskid=task.id)
-                  span= user.tasksMarks[task.id]
+                  span.sort-item= user.tasksMarks[task.id]
               else
                 td.step1-task.js-mark(data-taskid=task.id)
-                  span 0
-            td.step1-sum= totalMarkStep1
+                  span.sort-item 0
+            td.step1-sum
+              span.sort-item= totalMarkStep1
             -var totalMarkStep2 = 0
             each task in tasks.step2
               if user.tasksMarks[task.id]
                 -totalMarkStep2 += user.tasksMarks[task.id]
                 td.step2-task.js-mark(data-taskid=task.id)
-                  span= user.tasksMarks[task.id]
+                  span.sort-item= user.tasksMarks[task.id]
               else
                 td.step2-task.js-mark(data-taskid=task.id)
-                  span 0
-            td.step2-sum= totalMarkStep2
-            td.total-mark= totalMarkStep1 + totalMarkStep2
+                  span.sort-item 0
+            td.step2-sum
+              span.sort-item= totalMarkStep2
+            td.total-mark
+             span.sort-item= totalMarkStep1 + totalMarkStep2

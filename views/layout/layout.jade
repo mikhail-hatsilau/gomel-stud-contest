@@ -1,7 +1,8 @@
 doctype html
 html
   head
-    title GUUC
+    block title
+      title GUUC
     link(rel="stylesheet", href="/styles/lib/jquery-ui.min.css")
     link(rel="stylesheet", href="/styles/styles.css")
     block link
@@ -14,8 +15,6 @@ html
             if user
               case user.role.name
                 when "admin"
-                  li
-                    a(href="/marks") Marks
                   li.mui-dropdown
                     a(href="#", data-mui-toggle="dropdown") Results
                       <span class="mui-caret"></span>
@@ -37,11 +36,7 @@ html
                       li
                         a(href="/quizStepTasks") Step 2
                   li.mui-dropdown
-                    a(data-mui-toggle="dropdown", href="#") CSS Quiz
-                      <span class="mui-caret"></span>
-                    ul.mui-dropdown__menu
-                      li
-                        a(href="/quizBoard") Board
+                    a(href="/quizBoard") CSS Quiz board
 
                 when "student"
                   if !passed
@@ -49,7 +44,7 @@ html
                       a(href="/editor") Start
         ul.right.mui--appbar-height.mui--appbar-line-height
           if user
-            li
+            li= user.username
               a(href="/logout") Logout
           else
             li

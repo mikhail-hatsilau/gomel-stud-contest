@@ -42,10 +42,10 @@ module.exports.results = (next) ->
       taskRows[0].id,
       taskRows[0].name,
       taskRows[0].displayNumber,
-      taskRows[0].weight, 
+      taskRows[0].weight,
       taskRows[0].htmlCode,
       taskRows[0].cssCode,
-      taskRows[0].toDo, 
+      taskRows[0].toDo,
       taskRows[0].active
     )
 
@@ -56,6 +56,9 @@ module.exports.results = (next) ->
 
   resp = yield db.getTasks FIRST_STEP_ID
   rows = resp[0]
+
+  rows.sort (a, b) ->
+    a.displayNumber - b.displayNumber
 
   allTasks = rows.map (element) ->
     {
@@ -74,8 +77,6 @@ module.exports.showMarkup = (next) ->
 
   resp = yield db.getFirstStepTaskResults userId, taskNumber
   rows = resp[0]
-
-  console.log rows
 
   yield this.render 'resultsMarkup', {
     editorPage: true,

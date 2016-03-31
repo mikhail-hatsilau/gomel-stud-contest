@@ -17,10 +17,10 @@ module.exports = (app) ->
   router.get '/editor', checkAuth, require('./editor').get
   router.post '/save', checkAuth, require('./savePage').post
   router.post '/saveAdmin', checkAuth, adminAccess, require('./savePage').postAdmin
-  router.post '/pass', checkAuth, require('./passForm').post
+  router.post '/pass', checkAuth, require('./editor').passForm
   router.get '/quiz', checkAuth, require('./quiz').get
-  router.post '/endQuiz', checkAuth, require('./endQuiz')
-  router.get '/results', checkAuth, require('./results')
+  # router.post '/finishQuiz', checkAuth, require('./quiz').finishQuiz
+  router.get '/quizTaskComplete', checkAuth, require('./quiz').quizTaskComplete
   router.post '/saveResults', checkAuth, adminAccess, require('./results').save
   router.get '/users', checkAuth, adminAccess, require('./users').getAll
   router.get '/users/:userId', checkAuth, adminAccess, require('./users').getUser
@@ -48,5 +48,6 @@ module.exports = (app) ->
   router.post '/saveFirstStepTask/:taskId', checkAuth, adminAccess, require('./tasks').updateFirstStepTask
   router.post '/removeTask', checkAuth, adminAccess, require('./tasks').removeTask
   router.post '/activateTask', checkAuth, adminAccess, require('./tasks').activateTask
-  router.get '/quizTasks/:taskNumber', checkAuth, require('./quiz').quiz
+  router.get '/quizTasks/:taskId', checkAuth, require('./quiz').quiz
   router.get '/total', checkAuth, adminAccess, require('./results').total
+  router.get '/readyQuiz', checkAuth, require('./quiz').ready

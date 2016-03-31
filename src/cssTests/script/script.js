@@ -2,8 +2,8 @@ $ = require('jquery');
 
 $(function (){
 
-	var taskNumber = parseInt(localStorage.getItem('quizTaskNumber')) || 1;
-	var taskId;
+	// var taskNumber = parseInt(localStorage.getItem('quizTaskNumber'));
+	var taskId = parseInt(localStorage.getItem('quizTaskId'));
 	var rootNode;
 	var startTime;
 	var intervalId;
@@ -11,6 +11,7 @@ $(function (){
 	var forbidden;
 	var forbiddenFlag = true;
 	var savedTime;
+	var timeLimit = parseInt(localStorage.getItem('timeLimit'));
 
 	String.prototype.replaceAll = function (exp, str) {
 		return this.split(exp).join(str);
@@ -83,7 +84,7 @@ $(function (){
 		$('.html-wrapper').css('left', '0').css('top', '0').css('transform', 'rotate(0) scale(1)');
 	};
 
-	function simpleTimer(block) {
+	function simpleTimer(block, timeLimit) {
 	    // var time = (+$(block).html().split(':')[0]) * 60 + (+$(block).html().split(':')[1]);
 	    var minutes = parseInt(timer / 60);
 
@@ -94,40 +95,51 @@ $(function (){
 	    if ( seconds < 10 ) seconds = '0' + seconds;
 
 	    $(block).html(minutes + ':' + seconds);
+
+	    if (timeLimit) {
+	    	if (timeLimit - timer <= 10) {
+		    	$(block).addClass('red-color');
+		    	setTimeout(function(){
+		    		$(block).removeClass('red-color');
+		    	}, 400);
+		    }
+	    }
 	}
 
-	var showTask = function (num){
+	var showTask = function (){
 
-		function finish() {
-			localStorage.removeItem('quizTaskNumber');
-			$.ajax({
-				url: '/endQuiz',
-				method: 'POST'
-			})
-			.done(function(){
-				location.href = '/results'
-			})
-			.fail(function(){
-				console.log('Error occured')
-			});
-		}
+		// function finish() {
+		// 	localStorage.removeItem('quizTaskNumber');
+		// 	$.ajax({
+		// 		url: '/finishQuiz',
+		// 		method: 'POST'
+		// 	})
+		// 	.done(function(){
+		// 		location.href = '/finishResults'
+		// 	})
+		// 	.fail(function(){
+		// 		console.log('Error occured')
+		// 	});
+		// }
 
-		$.get("/quizTasks/" + num, function (data) {
-			localStorage.setItem('quizTaskNumber', taskNumber);
-			taskId = data.taskId;
+		$.get("/quizTasks/" + taskId, function (data) {
 			showHtmlBlock();
 			setTimeout(function (){
 				startTime = new Date();
-				savedTime = localStorage.getItem('quizTaskTime') || null
-				if(savedTime !== null) {
+				savedTime = localStorage.getItem('quizTime') || undefined
+				if(savedTime) {
 					startTime.setSeconds(startTime.getSeconds() - savedTime);
 				}
 				$('.time .data').html('00:00');
 				timer = savedTime || 0;
 				intervalId = setInterval(function (){
 					timer++;
-					localStorage.setItem('quizTaskTime', timer);
-					simpleTimer($('.time .data'));
+					localStorage.setItem('quizTime', timer);
+					simpleTimer($('.time .data'), timeLimit);
+					if (timeLimit && timer >= timeLimit) {
+						emitEvent(taskId, timeLimit, '', false);
+						completeTask();
+					}
 				}, 1000);
 			}, 500);
 			forbiddenFlag = true;
@@ -153,11 +165,25 @@ $(function (){
 				$('.html-code').append(html);
 			}
 		}).fail(function (){
-			finish();
+			//finish();
 			//$('.html-wrapper').html("<span style='color: #fff;'>That's all! You are <span style='color: red;'>C</span><span style='color: green;'>S</span><span style='color: blue;'>S</span>-master :)</span>");
-			console.log("Task is not found");
+			location.replace('/readyQuiz');
 		});
 	};
+
+	function completeTask() {
+		// hideHtmlBlock();
+		// clearInterval(intervalId);
+		// localStorage.removeItem('quizTaskTime', timer);
+		// setTimeout(function () {
+		// 	showTask(++taskNumber);
+		// }, 400);
+		// $('.selector').val("");
+		// hideHtmlBlock();
+		// $('.selector').val("");
+		clearInterval(intervalId);
+		location.replace('/readyQuiz');
+	}
 
 	var checkForWelldone = function (selector){
 		var needed = $('.needed');
@@ -172,12 +198,7 @@ $(function (){
 				time = (new Date() - startTime)/1000
 				console.log(time);
 				clearInterval(intervalId);
-				socketIo.emit('pass test', {
-					taskId: taskId,
-					taskNumber: taskNumber,
-					time: time,
-					selector: selector
-				});
+				emitEvent(taskId, time, selector, true)
 				return true;
 			} else {
 				return false;
@@ -186,6 +207,15 @@ $(function (){
 			return false;
 		}
 	};
+
+	function emitEvent(taskId, time, selector, passed) {
+		socketIo.emit('pass test', {
+			taskId: taskId,
+			time: time,
+			selector: selector,
+			passed: passed
+		});
+	}
 
 	var runSelector = function (selector) {
 		$('.html-code tr').removeClass('selected');
@@ -208,12 +238,7 @@ $(function (){
 			console.log(e);
 		}
 		if (checkForWelldone(selector)) {
-			hideHtmlBlock();
-			localStorage.removeItem('quizTaskTime');
-			setTimeout(function (){
-				showTask(++taskNumber)
-			}, 400);
-			$('.selector').val("");
+			completeTask()
 		}
 	};
 
@@ -221,5 +246,5 @@ $(function (){
 		runSelector($(this).val());
 	});
 
-	showTask(taskNumber);
+	showTask();
 });

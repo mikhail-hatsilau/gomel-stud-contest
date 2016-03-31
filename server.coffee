@@ -11,6 +11,7 @@ http = require 'http'
 socket = require 'socket.io'
 cookie = require 'cookie'
 db = require './database'
+QuizStepTask = require './models/quizStepTask'
 
 app = koa()
 httpServer = http.createServer app.callback()
@@ -38,7 +39,6 @@ app.use (next) ->
 
 app.use (next) ->
   this.state.user = this.session.user
-  this.state.passed = this.session.passedQuiz
   yield next
 
 router(app)
@@ -46,6 +46,26 @@ router(app)
 app.use serve(path.join __dirname, '/dist' )
 
 db.createConnection()
+
+getTasks = (rows) ->
+  tasks = []
+  for row in rows
+    task = new QuizStepTask(
+      row.id,
+      row.name,
+      row.displayNumber,
+      row.weight,
+      row.answares,
+      row.deprecatedSelectors,
+      row.htmlCode,
+      row.active
+    )
+    tasks.push task
+
+  tasks.sort (a, b) ->
+    a.displayNumber - b.displayNumber
+
+  tasks
 
 io.use (socket, next) ->
   handShakeData = socket.request
@@ -58,15 +78,34 @@ io.use (socket, next) ->
     next(new Error('Not authorized'))
 
 io.on 'connection', (socket) ->
-  socket.on 'ready to start', ->
-    socket.join 'ready room'
-    socket.broadcast.emit 'add user', socket.request.user
+  # socket.on 'ready to start', ->
+  #   socket.join 'ready room'
+  #   socket.broadcast.emit 'add user', socket.request.user
 
-  socket.on 'begin', (data, callback) ->
-    io.to 'ready room'
-      .emit 'start quiz'
-    db.clearQuizResults()
-    callback()
+  socket.on 'init quiz', ->
+    socket.broadcast.emit 'init'
+
+  socket.on 'begin', (time, callback) ->
+    QUIZ_STEP_ID = 2
+    # io.to 'ready room'
+    #   .emit 'start quiz', time * 60
+    db.getActiveTasksPromise QUIZ_STEP_ID
+      .then (resp) ->
+        db.clearQuizResults()
+        tasks = getTasks resp[0]
+        socket.broadcast.emit 'next', {
+          time: time,
+          taskId: tasks[0].id
+        }
+        callback tasks
+
+  socket.on 'next task', (data) ->
+    # io.to 'ready room'
+    #   .emit 'next', time * 1000
+    socket.broadcast.emit 'next', {
+      time: data.timeLimit,
+      taskId: data.taskId
+    }
 
   socket.on 'pass test', (data) ->
     data.user = socket.request.user

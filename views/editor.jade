@@ -1,5 +1,8 @@
 extends ./layout/layout.jade
 
+block title
+  title Step 1
+
 block content
   .bar.clearfix
     .editors
@@ -12,9 +15,10 @@ block content
         frameborder="0",
         class="js-result",
         sandbox="allow-forms allow-same-origin allow-scripts")
-    button.round-btn.next-task Next
+    button.mui-btn.mui-btn--fab.mui-btn--primary.next-task Next
 
   .to-do-block
+  .timer
 
 block scripts
   script(src='scripts/editor.js')

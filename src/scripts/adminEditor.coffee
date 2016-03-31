@@ -7,6 +7,7 @@ require('./dividers')()
 
 htmlEditorElement = $('#htmlEditor')
 cssEditorElement = $('#cssEditor')
+editor = $('.editor')
 
 saveChanges = (params) ->
   params = 
@@ -77,4 +78,10 @@ $('.quiz-task-edit-form').on 'submit', (event) ->
     htmlCode: editorHtml.getValue()
 
   submitEditTaskForm targetForm, options, '/quizStepTasks'
+
+editor.on 'editorResize', ->
+  console.log 'resize'
+  editorHtml.resize()
+  if editorCss
+    editorCss.resize()
 
