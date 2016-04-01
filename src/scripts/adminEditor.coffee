@@ -33,6 +33,7 @@ if htmlEditorElement.length
   editorHtml = ace.edit 'htmlEditor'
   editorHtml.on 'change', _.debounce(htmlCodeChanged, 2000)
   editorHtml.getSession().setMode 'ace/mode/html'
+  editorHtml.session.setOptions { tabSize: 2, useSoftTabs: false }
   editorHtml.setValue htmlCode, -1
 
 if cssEditorElement.length
@@ -40,6 +41,7 @@ if cssEditorElement.length
   editorCss = ace.edit 'cssEditor'
   editorCss.on 'change', _.debounce(cssCodeChanged, 2000)
   editorCss.getSession().setMode 'ace/mode/css'
+  editorCss.session.setOptions { tabSize: 2, useSoftTabs: false }
   editorCss.setValue cssCode, -1
 
 submitEditTaskForm = (form, options, url) -> 

@@ -12,9 +12,11 @@ intervalId = undefined
 
 editorHtml = ace.edit 'editorHtml'
 editorHtml.getSession().setMode 'ace/mode/html'
+editorHtml.session.setOptions { tabSize: 2, useSoftTabs: false }
 
 editorCss = ace.edit 'editorCss'
 editorCss.getSession().setMode 'ace/mode/css'
+editorCss.session.setOptions { tabSize: 2, useSoftTabs: false }
 
 setLocalStorage = (key, value) ->
   localStorage.setItem key, value
@@ -77,26 +79,26 @@ showTask = (task) ->
 loadTask = ->
   $.get "/next/#{taskNumber}"
     .done (resp) ->
-      nextTaskBtn = $('.next-task')
+      # nextTaskBtn = $('.next-task')
 
-      if resp.next
-        nextTaskBtn.show()
-      else
-        nextTaskBtn.hide()
-
-      setLocalStorage 'taskNumber', taskNumber
+      # if resp.next
+      #   nextTaskBtn.show()
+      # else
+      #   nextTaskBtn.hide()
 
       taskId = resp.task.id
+      taskNumber = resp.taskNumber
+
+      setLocalStorage 'taskNumber', taskNumber
 
       task =
         htmlCode: resp.task.htmlCode
         cssCode: resp.task.cssCode
         toDo: resp.task.toDo
+
       showTask(task)
     .fail (xhr) ->
-      taskNumber--
-      if xhr.status is 403
-        alert xhr.responseJSON.message
+      console.log 'Error occured'
 
 saveTaskResults = () ->
   $.post '/saveTaskResults', { 
@@ -106,7 +108,6 @@ saveTaskResults = () ->
     cssCode: editorCss.getValue()
   }
     .done ->
-      taskNumber++
       clearLocalStorageItem 'htmlCode'
       clearLocalStorageItem 'cssCode'
       clearLocalStorageItem 'firstStepStartTime'
@@ -115,9 +116,9 @@ saveTaskResults = () ->
     .error ->
       console.log 'Error while saving task results'
 
-startQuiz = ->
-  clearLocalStorageItem 'taskNumber'
-  location.href = '/quiz'
+# startQuiz = ->
+#   clearLocalStorageItem 'taskNumber'
+#   location.href = '/quiz'
 
 parseTime = (time) ->
   minutes = parseInt time / 60
@@ -144,7 +145,7 @@ submitFrameForm = (action) ->
       # contentBlock.append $('<div class="timer"/>')
       # body.empty()
       # body.append contentBlock
-      # saveTaskResults()
+      saveTaskResults()
       # socketIo.emit 'ready to start'
       location.href = '/readyQuiz'
 

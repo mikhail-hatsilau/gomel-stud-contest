@@ -10,8 +10,10 @@ block content
       tr
         th Id
         th Name
-        th Display number
-        th Weight
+        th(data-col=2) Display number
+          button.js-sort Sort
+        th(data-col=3) Weight
+          button.js-sort Sort
         th Active
         th
     tbody
@@ -19,8 +21,10 @@ block content
         tr(data-id=task.id)
           td= task.id
           td= task.name
-          td= task.displayNumber
-          td= task.weight
+          td
+            span.sort-item= task.displayNumber
+          td
+            span.sort-item= task.weight
           td
             input.active-task(type="checkbox", name="active", value=task.active, autocomplete="off", checked=task.active ? true : false)
           td

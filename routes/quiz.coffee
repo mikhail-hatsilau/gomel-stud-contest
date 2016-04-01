@@ -1,7 +1,10 @@
 db = require '../database'
+QuizStepTask = require '../models/quizStepTask'
 
 # TIME_LIMIT_OPTION = 'timeLimit'
 # WAITING_TIME_OPTION = 'quizWaitingTime'
+
+QUIZ_STEP_ID = 2
 
 module.exports.get = (next) ->
   # if not this.session.passedForm or this.session.passedQuiz
@@ -12,14 +15,14 @@ module.exports.quiz = (next) ->
   taskId = this.params.taskId
   userId = this.session.user.id
 
-  resp = yield db.quizResultsOfStudent taskId, userId
+  # resp = yield db.quizResultsOfStudent taskId, userId
 
-  if resp[0].length
-    this.response.status = 403
-    this.body = 
-      status: 'error'
-      message: 'You have already passed this task!'
-    return
+  # if resp[0].length
+  #   this.response.status = 403
+  #   this.body = 
+  #     status: 'error'
+  #     message: 'You have already passed this task!'
+  #   return
 
   resp = yield db.getTaskById taskId
   rows = resp[0]
@@ -42,6 +45,33 @@ module.exports.quiz = (next) ->
 
 module.exports.ready = (next) ->
   yield this.render 'readyQuiz'
+
+module.exports.quizTasks = (next) ->
+  # QUIZ_STEP_ID = 2
+  resp = yield db.getActiveTasks QUIZ_STEP_ID
+  rows = resp[0]
+
+  tasks = for row in rows
+    task = new QuizStepTask(
+      row.id,
+      row.name,
+      row.displayNumber,
+      row.weight,
+      row.answares,
+      row.deprecatedSelectors,
+      row.htmlCode
+    )
+
+  console.log tasks
+
+  this.body = 
+    tasks: tasks
+
+module.exports.clear = (next) ->
+  yield db.clearQuizResults()
+  this.body =
+    status: 'ok'
+    message: 'Quiz results were cleared'
 
 # module.exports.settings = (next) ->
 #   resp = yield db.getSettings()

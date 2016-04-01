@@ -24,11 +24,18 @@ module.exports.next = (next) ->
   FIRST_STEP_ID = 1
   taskNumber = parseInt this.params.task
 
-  resp = yield db.getTaskByDisplayNumber taskNumber, FIRST_STEP_ID
-  rows = resp[0]
+  loop
+    resp = yield db.getTaskByDisplayNumber taskNumber, FIRST_STEP_ID
+    rows = resp[0]
+    taskNumber++
+    break if not rows.length or rows[0].active
 
   if not rows.length
-    this.throw 'No such task', 404
+    this.response.status = 404
+    this.body = 
+      status: 'error'
+      message: 'No such task'
+    return
 
   task = new FirstStepTask(
     rows[0].id,
@@ -41,20 +48,16 @@ module.exports.next = (next) ->
     rows[0].active
   )
 
-  if not task.active
-    this.response.status = 403
-    this.body = 
-      status: 'Error'
-      message: 'Next task is not opened yet'
-    return 
+  # if not task.active
+  #   this.response.status = 403
+  #   this.body = 
+  #     status: 'Error'
+  #     message: 'Next task is not opened yet'
+  #   return 
 
-  resp = yield db.getTaskByDisplayNumber taskNumber + 1, FIRST_STEP_ID
-  rows = resp[0]
-
-  this.body = {
+  this.body =
     task: task
-    next: !!rows.length
-  }
+    taskNumber: taskNumber
 
 module.exports.passForm = (next) ->
   QUIZ_WAIT_TIME_OPTION = 'quizWaitingTime'

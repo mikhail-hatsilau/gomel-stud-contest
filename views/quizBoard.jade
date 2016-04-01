@@ -10,13 +10,18 @@ block content
 
   .actions
     button.mui-btn.mui-btn--primary.init-quiz Init
-    button.mui-btn.mui-btn--primary.start-quiz-btn Start quiz
-    button.mui-btn.mui-btn--primary.next-quiz-task Next
+    button.mui-btn.mui-btn--primary.start-quiz-btn(disabled=true) Start quiz
+    button.mui-btn.mui-btn--primary.stop-quiz-task(disabled=true) Stop task
+    button.mui-btn.mui-btn--primary.next-quiz-task(disabled=true) Next
+    button.mui-btn.mui-btn--primary.clear-quiz-results Clear results
 
-  .current-task Current task:
-    span
+  .board-task-info
+    .current-task Current task:
+      span
+    .admin-timer Time:
+      span 00:00
 
-  table.mui-table.mui-table--bordered.participants-list
+  table.mui-table.mui-table--bordered.participants-list(data-count= allTasks.length)
     thead
       tr
         th Participant
@@ -24,9 +29,9 @@ block content
           th= task.name
         th Total time
     tbody
-      each user in users
-        tr(data-id= user.id)
-          td= user.firstName + ' ' + user.lastName
-          each task in allTasks
-            td(data-taskid=task.id)
-          td.total
+      //- each user in users
+      //-   tr(data-id= user.id)
+      //-     td= user.firstName + ' ' + user.lastName
+      //-     each task in allTasks
+      //-       td(data-taskid=task.id)
+      //-     td.total

@@ -48,10 +48,20 @@ module.exports.getParticipants = ->
   QUERY = "SELECT * FROM #{USERS_TABLE} WHERE role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
   connection.query QUERY
 
+module.exports.getQuizResults = (userId, taskId) ->
+  co ->
+    QUERY = "SELECT * FROM #{QUIZ_TABLE} WHERE stud_id = ? AND task = ?;"
+    yield connection.query QUERY, [userId, taskId]
+
 module.exports.saveQuizResults = (result, id) ->
   co ->
     QUERY = "INSERT INTO #{QUIZ_TABLE} (stud_id, task, time, selector) VALUE (?,?,?,?);"
     yield connection.query QUERY, [id, result.taskId, result.time, result.selector]
+
+module.exports.updateQuizResults = (result, userId) ->
+  co ->
+    QUERY = "UPDATE #{QUIZ_TABLE} set time = ?, selector = ? WHERE stud_id = ? AND task = ?;"
+    yield connection.query QUERY, [result.time, result.selector, userId, result.taskId]
 
 module.exports.getRoles = ->
   QUERY = "SELECT * FROM #{ROLES_TABLE};"
@@ -101,8 +111,7 @@ module.exports.createResultForUser = (userId, taskId, value) ->
 
 module.exports.clearQuizResults = ->
   QUERY = "DELETE FROM #{QUIZ_TABLE};"
-  co ->
-    yield connection.query QUERY
+  yield connection.query QUERY
 
 module.exports.saveFirstStepResults = (userId, taskId, time, htmlCode, cssCode, path) ->
   QUERY = "INSERT INTO #{FIRST_STEP_TABLE} (user_id, task, time, htmlCode, cssCode, path) VALUE (?,?,?,?,?,?);"

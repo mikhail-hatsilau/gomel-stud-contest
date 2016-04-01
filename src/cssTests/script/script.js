@@ -124,31 +124,35 @@ $(function (){
 
 		$.get("/quizTasks/" + taskId, function (data) {
 			showHtmlBlock();
-			setTimeout(function (){
-				startTime = new Date();
-				savedTime = localStorage.getItem('quizTime') || undefined
-				if(savedTime) {
-					startTime.setSeconds(startTime.getSeconds() - savedTime);
+			// setTimeout(function (){
+				
+			// }, 500);
+			startTime = new Date();
+			savedTime = localStorage.getItem('quizTime') || undefined
+			if(savedTime) {
+				startTime.setSeconds(startTime.getSeconds() - savedTime);
+			}
+			$('.time .data').html('00:00');
+			timer = savedTime || 0;
+			intervalId = setInterval(function (){
+				timer++;
+				localStorage.setItem('quizTime', timer);
+				simpleTimer($('.time .data'), timeLimit);
+				if (timeLimit && timer >= timeLimit) {
+					emitEvent(taskId, timeLimit, '', false);
+					completeTask();
 				}
-				$('.time .data').html('00:00');
-				timer = savedTime || 0;
-				intervalId = setInterval(function (){
-					timer++;
-					localStorage.setItem('quizTime', timer);
-					simpleTimer($('.time .data'), timeLimit);
-					if (timeLimit && timer >= timeLimit) {
-						emitEvent(taskId, timeLimit, '', false);
-						completeTask();
-					}
-				}, 1000);
-			}, 500);
+			}, 1000);
 			forbiddenFlag = true;
 			$('.html-code').html("");
 			var lines = data.htmlCode.split("\n");
+			console.log(lines[1]);
 			var needed = data.answares.split(",").map(Number);
-			console.log(data.deprecatedSelectors.split(' '));
-			forbidden = data.deprecatedSelectors.split(' ');
-
+			if (data.deprecatedSelectors.trim().length === 0) {
+				forbidden = []
+			} else {
+				forbidden = data.deprecatedSelectors.split(' ');
+			}
 			$('.forbidden .data').html(data.deprecatedSelectors);
 			rootNode = $("<div/>");
 			rootNode.append(data.htmlCode);
@@ -167,9 +171,15 @@ $(function (){
 		}).fail(function (){
 			//finish();
 			//$('.html-wrapper').html("<span style='color: #fff;'>That's all! You are <span style='color: red;'>C</span><span style='color: green;'>S</span><span style='color: blue;'>S</span>-master :)</span>");
-			location.replace('/readyQuiz');
+			//location.replace('/readyQuiz');
+			console.log('Error');
 		});
 	};
+
+	socketIo.on('stop', function(){
+		emitEvent(taskId, timeLimit, '', false);
+		completeTask()
+	});
 
 	function completeTask() {
 		// hideHtmlBlock();

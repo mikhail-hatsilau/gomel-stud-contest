@@ -19,9 +19,8 @@ module.exports = (app) ->
   router.post '/saveAdmin', checkAuth, adminAccess, require('./savePage').postAdmin
   router.post '/pass', checkAuth, require('./editor').passForm
   router.get '/quiz', checkAuth, require('./quiz').get
-  # router.post '/finishQuiz', checkAuth, require('./quiz').finishQuiz
   router.get '/quizTaskComplete', checkAuth, require('./quiz').quizTaskComplete
-  router.post '/saveResults', checkAuth, adminAccess, require('./results').save
+  router.post '/saveResults', checkAuth, adminAccess, require('./marks').save
   router.get '/users', checkAuth, adminAccess, require('./users').getAll
   router.get '/users/:userId', checkAuth, adminAccess, require('./users').getUser
   router.get '/roles', checkAuth, adminAccess, require('./roles')
@@ -48,6 +47,8 @@ module.exports = (app) ->
   router.post '/saveFirstStepTask/:taskId', checkAuth, adminAccess, require('./tasks').updateFirstStepTask
   router.post '/removeTask', checkAuth, adminAccess, require('./tasks').removeTask
   router.post '/activateTask', checkAuth, adminAccess, require('./tasks').activateTask
+  router.get '/quizTasks', checkAuth, adminAccess, require('./quiz').quizTasks
   router.get '/quizTasks/:taskId', checkAuth, require('./quiz').quiz
-  router.get '/total', checkAuth, adminAccess, require('./results').total
+  router.get '/marks', checkAuth, adminAccess, require('./marks').marks
   router.get '/readyQuiz', checkAuth, require('./quiz').ready
+  router.post '/clearQuiz', checkAuth, adminAccess, require('./quiz').clear

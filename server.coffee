@@ -48,8 +48,7 @@ app.use serve(path.join __dirname, '/dist' )
 db.createConnection()
 
 getTasks = (rows) ->
-  tasks = []
-  for row in rows
+  tasks = for row in rows
     task = new QuizStepTask(
       row.id,
       row.name,
@@ -60,7 +59,6 @@ getTasks = (rows) ->
       row.htmlCode,
       row.active
     )
-    tasks.push task
 
   tasks.sort (a, b) ->
     a.displayNumber - b.displayNumber
@@ -78,38 +76,64 @@ io.use (socket, next) ->
     next(new Error('Not authorized'))
 
 io.on 'connection', (socket) ->
-  # socket.on 'ready to start', ->
-  #   socket.join 'ready room'
-  #   socket.broadcast.emit 'add user', socket.request.user
+  if socket.request.user.role.name is 'admin'
+    socket.join 'admin room'
+  else
+    socket.join 'students room'
 
-  socket.on 'init quiz', ->
-    socket.broadcast.emit 'init'
-
-  socket.on 'begin', (time, callback) ->
+  socket.on 'init quiz', (data, callback) ->
     QUIZ_STEP_ID = 2
-    # io.to 'ready room'
-    #   .emit 'start quiz', time * 60
     db.getActiveTasksPromise QUIZ_STEP_ID
       .then (resp) ->
-        db.clearQuizResults()
+        # db.clearQuizResults()
         tasks = getTasks resp[0]
-        socket.broadcast.emit 'next', {
-          time: time,
-          taskId: tasks[0].id
-        }
+        io.to('students room').emit 'init'
         callback tasks
 
-  socket.on 'next task', (data) ->
+  socket.on 'ready', ->
+    socket.join 'ready room'
+    io.to('admin room').emit 'add user', socket.request.user
+
+  # socket.on 'begin', (time, callback) ->
+  #   # io.to 'ready room'
+  #   #   .emit 'start quiz', time * 60
+   
+        
+  #       callback tasks
+  #   io.to('ready room').emit 'next', {
+  #     time: time,
+  #     taskId: tasks[0].id
+  #   }
+
+  socket.on 'next task', (data, callback) ->
     # io.to 'ready room'
     #   .emit 'next', time * 1000
-    socket.broadcast.emit 'next', {
-      time: data.timeLimit,
-      taskId: data.taskId
-    }
+    io.to 'ready room'
+      .emit 'next', {
+        time: data.timeLimit,
+        taskId: data.taskId
+      }
+
+    callback()
 
   socket.on 'pass test', (data) ->
     data.user = socket.request.user
-    socket.broadcast.emit 'test passed', data
-    db.saveQuizResults data, socket.request.user.id
+    io.to('admin room').emit 'test passed', data
+    db.getQuizResults socket.request.user.id, data.taskId
+      .then (resp) ->
+        rows = resp[0]
+        if rows.length
+          if data.time < rows[0].time
+            db.updateQuizResults data, socket.request.user.id
+        else
+          db.saveQuizResults data, socket.request.user.id
+
+  socket.on 'stop task', (data, callback) ->
+    io.to('students room').emit 'stop'
+    console.log callback
+    callback()
+
+  socket.on 'start step1', ->
+    io.to('students room').emit 'start first step'
   
 httpServer.listen config.get('port')

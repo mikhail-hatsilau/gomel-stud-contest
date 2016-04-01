@@ -4,7 +4,7 @@ Role = require '../models/role'
 FirstStepTask = require '../models/firstStepTask'
 QuizStepTask = require '../models/quizStepTask'
 
-module.exports.total = (next) ->
+module.exports.marks = (next) ->
   FIRST_STEP_ID = 1
   QUIZ_STEP_ID = 2
 

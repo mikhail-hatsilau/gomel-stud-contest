@@ -6,12 +6,10 @@ Role = require '../models/role'
 
 module.exports = (next) ->
   QUIZ_STEP_ID = 2
-  resp = yield db.getTasks QUIZ_STEP_ID
+  resp = yield db.getActiveTasks QUIZ_STEP_ID
   rows = resp[0]
-  allTasks = []
-  users = []
 
-  for row in rows
+  allTasks = for row in rows
     task = new QuizStepTask(
       row.id,
       row.name,
@@ -22,7 +20,6 @@ module.exports = (next) ->
       row.htmlCode,
       row.active,
     )
-    allTasks.push task
 
   allTasks.sort (a, b) ->
     a.displayNumber - b.displayNumber
@@ -34,7 +31,7 @@ module.exports = (next) ->
   roleRows = roleResp[0]
   role = new Role roleRows[0].id, roleRows[0].name
 
-  for row in rows
+  users = for row in rows
     user = new User(
       row.id,
       row.username,
@@ -43,7 +40,6 @@ module.exports = (next) ->
       row.active,
       role
     )
-    users.push user
 
   yield this.render 'quizBoard', { 
     allTasks: allTasks,

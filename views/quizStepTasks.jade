@@ -10,8 +10,10 @@ block content
       tr
         th Id
         th Name
-        th Display number
-        th Weight
+        th(data-col=2) Display number
+          button.js-sort Sort
+        th(data-col=3) Weight
+          button.js-sort Sort
         th Answare
         th Deprecated selectors
         th Active
@@ -21,8 +23,10 @@ block content
         tr(data-id=task.id)
           td= task.id
           td= task.name
-          td= task.displayNumber
-          td= task.weight
+          td
+            span.sort-item= task.displayNumber
+          td
+            span.sort-item= task.weight
           td= task.answares
           td= task.deprecatedSelectors
           td
