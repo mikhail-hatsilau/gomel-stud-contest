@@ -62,16 +62,21 @@ module.exports.quizTasks = (next) ->
       row.htmlCode
     )
 
-  console.log tasks
-
   this.body = 
     tasks: tasks
 
 module.exports.clear = (next) ->
-  yield db.clearQuizResults()
-  this.body =
-    status: 'ok'
-    message: 'Quiz results were cleared'
+  try
+    yield db.clearQuizResults()
+    this.body =
+      status: 'ok'
+      message: 'Quiz results were cleared'
+  catch error
+    console.log error
+    this.response.status = 500
+    this.body = 
+      status: 'error'
+      message: 'Error occured while clearing quiz results'
 
 # module.exports.settings = (next) ->
 #   resp = yield db.getSettings()

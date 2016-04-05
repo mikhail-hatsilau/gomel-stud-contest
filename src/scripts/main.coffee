@@ -1,5 +1,7 @@
 $ = require 'jquery'
+_ = require 'lodash'
 require 'jquery-ui'
+statusPopup = require('./statusPopup')()
 
 # # Validates fields in the sign in form
 # validate = ->
@@ -271,8 +273,11 @@ activateUser = ->
       active: $(this).prop('checked')
     }
   }
+    .done (resp) ->
+      statusPopup.showSuccessPopup resp.message
     .fail ->
       console.log 'Error occured while activating user'
+      statusPopup.showErrorPopup 'Error'
 
 $('.ativate-user').on 'click', (event) ->
  activateUser.call this
@@ -292,6 +297,10 @@ convertTimeToSeconds = (time) ->
   seconds = parseInt parts[1], 10
   minutes * 60 + seconds
 
+# Quiz board page
+allTasks = undefined
+currentTasks = undefined
+
 setTimer = ->
   clearInterval intervalId
   adminTimerElement = $('.admin-timer').find('span')
@@ -301,81 +310,107 @@ setTimer = ->
   intervalId = setInterval(->
     adminTimerElement.text parseTime(++time)
     if time >= timeLimit
-      clearTimer()
+      stopTask()
       
   , 1000)
 
-clearTimer = ->
+stopTask = ->
   clearInterval intervalId
-  $('.admin-timer').find('span').text '00:00'
+  # $('.admin-timer').find('span').text '00:00'
   $('.stop-quiz-task').prop 'disabled', true
-
-# Quiz board page
-allTasks = undefined
+  if not currentTasks.length
+    $('.start-quiz-btn').prop 'disabled', true
+    localStorage.removeItem 'currentQuizTask'
+  else
+    $('.start-quiz-btn').prop 'disabled', false
+    localStorage.setItem 'currentQuizTask', currentTasks[0].id
 
 emitNextTaskEvent = (data, callback) ->
   socketIo.emit 'next task', data, ->
     localStorage.setItem 'currentQuizTask', data.taskId
     callback()
 
+fillQuizBoardTable = ->
+  board = $('.participants-list')
+  headRow = board.find('thead').find('tr').empty()
+
+  headRow.append $('<th />').text('Participant')
+
+  for task in allTasks
+    headRow.append $('<th />').text(task.name)
+
+  headRow.append $('<th />').text('Total time')
+
 $('.init-quiz').on 'click', (event) ->
+  users.length = 0
   $('.participants-list')
     .find 'tbody'
     .empty()
-  clearTimer()
   socketIo.emit 'init quiz', null, (tasks) ->
+    savedTaskId = localStorage.getItem('currentQuizTask')
+    if savedTaskId isnt null
+      taskIndex = _.findIndex tasks, { id: +savedTaskId }
+      task = tasks[taskIndex]
+      currentTasks = _.filter tasks, (element) ->
+        element.displayNumber >= task.displayNumber
+    else 
+      currentTasks = tasks
+
+    $('.current-task').find('span').text currentTasks[0].name
     allTasks = tasks
-    $('.start-quiz-btn').prop 'disabled', false
+
+    fillQuizBoardTable()
+    stopTask()
 
 $('.start-quiz-btn').on 'click', ->
   that = this
   timeLimit = $('.quiz-task-time').find('input').val()
-  task = allTasks.shift()
+  task = currentTasks.shift()
   emitNextTaskEvent({
     timeLimit: timeLimit,
     taskId: task.id
   },  ->
     $('.current-task').find('span').text task.name
-    $('.next-quiz-task').prop 'disabled', false
+    # $('.next-quiz-task').prop 'disabled', false
     $('.stop-quiz-task').prop 'disabled', false
     $(that).prop 'disabled', true
-    if not allTasks.length
-      $('.next-quiz-task').prop 'disabled', true
+    # if not allTasks.length
+    #   $('.next-quiz-task').prop 'disabled', true
     setTimeout setTimer, 500
   )
 
 $('.stop-quiz-task').on 'click', ->
-  clearInterval intervalId
-  $('.start-quiz-btn').prop 'disabled', false
   socketIo.emit 'stop task', null, ->
-    $('.stop-quiz-task').prop 'disabled', true
-    $('.next-quiz-task').prop 'disabled', true
-    if not allTasks.length
-      $('.start-quiz-btn').prop 'disabled', true
+    # $('.start-quiz-btn').prop 'disabled', false
+    stopTask()
+    # $('.next-quiz-task').prop 'disabled', true
 
-$('.next-quiz-task').on 'click', ->
-  timeLimit = $('.quiz-task-time').find('input').val()
-  task = allTasks.shift()
+# $('.next-quiz-task').on 'click', ->
+#   timeLimit = $('.quiz-task-time').find('input').val()
+#   task = allTasks.shift()
 
-  emitNextTaskEvent({
-    timeLimit: timeLimit,
-    taskId: task.id
-  }, ->
-    setTimeout setTimer, 500
-  )
+#   emitNextTaskEvent({
+#     timeLimit: timeLimit,
+#     taskId: task.id
+#   }, ->
+#     $('.stop-quiz-task').prop 'disabled', false
+#     setTimeout setTimer, 500
+#   )
 
-  if allTasks
-    $('.current-task').find('span').text task.name
+#   $('.current-task').find('span').text task.name
 
-  if not allTasks.length
-    $(this).prop 'disabled', true
+#   if not allTasks.length
+#     $(this).prop 'disabled', true
 
 $('.clear-quiz-results').on 'click', ->
   $.post '/clearQuiz'
     .done (resp) ->
       console.log resp.message
+      statusPopup.showSuccessPopup resp.message
+      localStorage.removeItem 'currentQuizTask'
     .fail ->
       console.log 'Error ocured'
+      statusPopup.showErrorPopup 'Results were not cleared'
 
 # saveResults function sends ajax for saving marks.
 # Also it hides inputs, shows spans and calculates total
@@ -497,8 +532,11 @@ $('.active-task').on 'click', (event) ->
     taskId: taskId,
     active: targetCheckbox.prop('checked')
   }
+    .done (resp) ->
+      statusPopup.showSuccessPopup resp.message
     .fail ->
       console.log 'Error occured'
+      statusPopup.showErrorPopup 'Error'
 
 # $('.save-settings').find('input[type="checkbox"]').on 'click', (event) ->
 #   state = $(this).prop 'checked'
@@ -538,49 +576,78 @@ $('.active-task').on 'click', (event) ->
 $('.start-first-step').on 'click', ->
   socketIo.emit 'start step1'
 
-tasks = undefined
-if $('.participants-list').length
-  $.get '/quizTasks'
-    .done (resp) ->
-      tasks = resp.tasks
+# tasks = undefined
+# if $('.participants-list').length
+#   $.get '/quizTasks'
+#     .done (resp) ->
+#       tasks = resp.tasks
 
-socketIo.on 'add user', (user) ->
+FAIL_SYMBOL = '--'
+
+users = []
+
+getTotalTime = (resultsOfUser) ->
+  totalTime = resultsOfUser.reduce((sum, current)->
+    sum += parseInt current.time
+  , 0)
+  totalTime
+
+socketIo.on 'add user', (data) ->
+  console.log 'add'
+  user = data.user
+  user.results = data.results
+  users.push user
   participantsTable = $('.participants-list')
   participantsList = participantsTable.find 'tbody'
   if participantsList.find("tr[data-id=#{user.id}]").length
     return
   participant = $('<tr class="participant" data-id=' + user.id + ' />')
   participant.append $('<td />').text(user.firstName + ' ' + user.lastName)
-  if tasks
-    for task in tasks
-      participant.append $("<td data-taskid=#{task.id}/>")
-  participant.append $('<td class="total" />')
+  for task in allTasks
+    participant.append $("<td data-taskid=#{task.id}/>")
+  participant.append $('<td class="total" />').text parseTime(getTotalTime(user.results))
   participant.appendTo participantsList
+
+  for result in user.results
+    passedTaskColumn = participant.find "td[data-taskid=#{result.task}]"
+    if result.selector.length
+      passedTaskColumn
+        .append $('<span class="time"/>').text(parseTime(result.time))
+        .append $('<span class="selector-length"/>').text(result.selector.length)
+    else 
+      passedTaskColumn.text FAIL_SYMBOL
 
 # Event from the server. When user passes one test of the quiz this function is called
 # and adds results to the list
 socketIo.on 'test passed', (data) ->
-  FAIL_SYMBOL = '--'
-  user = data.user
+  userIndex = _.findIndex users, { id: data.user.id }
+  user = users[userIndex]
+  resultIndex = _.findIndex user.results, { task: data.results.taskId }
+  console.log resultIndex
+  if resultIndex isnt -1
+    user.results[resultIndex] = data.results
+  else
+    user.results.push data.results
   participantsList = $('.participants-list').find 'tbody'
   participantsRows = participantsList.find 'tr'
   participant = participantsList.find 'tr[data-id=' + user.id + ']'
   columns = participant.find('td').toArray()
-  task = participant.find "td[data-taskid= #{data.taskId}]"
+  task = participant.find "td[data-taskid= #{data.results.taskId}]"
+  task.empty()
   time = $('<span class="time"/>')
   selectorLength = $('<span class="selector-length"/>')
 
-  if not data.passed
+  if not data.results.passed
     time.text '--'
-    time.data 'limit', data.time
+    time.data 'limit', data.results.time
     selectorLength.text ''
     participant.css 'background-color', '#f44336'
     setTimeout( ->
       participant.css 'background-color', ''
     , 500)
   else
-    time.text parseTime(data.time)
-    selectorLength.text data.selector.length
+    time.text parseTime(data.results.time)
+    selectorLength.text data.results.selector.length
     participant.css 'background-color', '#b2ff59'
     setTimeout( ->
       participant.css 'background-color', ''
@@ -588,18 +655,18 @@ socketIo.on 'test passed', (data) ->
 
   task.append(time).append(selectorLength)
 
-  columns.splice(0, 1)
-  columns.splice(-1, 1)
+  # columns.splice(0, 1)
+  # columns.splice(-1, 1)
 
-  totalTime = columns.reduce((sum, current)->
-    timeCell = $(current).find('.time')
-    if timeCell.text() is FAIL_SYMBOL
-      sum += +timeCell.data 'limit'
-    else
-      sum += convertTimeToSeconds(timeCell.text())
-  , 0)
+  # totalTime = columns.reduce((sum, current)->
+  #   timeCell = $(current).find('.time')
+  #   if timeCell.text() is FAIL_SYMBOL
+  #     sum += +timeCell.data 'limit'
+  #   else
+  #     sum += convertTimeToSeconds(timeCell.text())
+  # , 0)
 
-  participant.find('.total').text parseTime(totalTime)
+  participant.find('.total').text parseTime(getTotalTime(user.results))
 
   participantsRows.sort (a, b) ->
     totalTimeA = $(a).find '.total'
@@ -609,7 +676,7 @@ socketIo.on 'test passed', (data) ->
   participantsRows.detach().appendTo participantsList
 
 socketIo.on 'init', ->
-  localStorage.removeItem 'quizTime'
+  localStorage.clear()
   # socketIo.emit 'ready'
   location.replace '/readyQuiz'
 
@@ -617,9 +684,8 @@ socketIo.on 'next', (data) ->
   localStorage.setItem 'timeLimit', data.time
   localStorage.setItem 'quizTaskId', data.taskId
   localStorage.removeItem 'quizTime'
-  console.log 'next'
   location.replace '/quiz'
 
 socketIo.on 'start first step', ->
-  # localStorage.clear()
+  localStorage.clear()
   location.replace '/editor'

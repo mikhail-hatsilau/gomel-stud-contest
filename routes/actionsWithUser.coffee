@@ -45,8 +45,13 @@ module.exports.edit = (next) ->
 module.exports.activate = (next) ->
   active = this.request.body.active is 'true'
   userId = this.request.body.userId
-  console.log typeof active
-
-  resp = yield db.updateActiveState userId, active
-  this.body =
-    status: 'ok'
+  try
+    yield db.updateActiveState userId, active
+    this.body =
+      status: 'ok'
+      message: 'Active state has been changed'
+  catch error
+    this.response.status = 500
+    this.body = 
+      status: 'error'
+      message: 'Error occured while changing active state'

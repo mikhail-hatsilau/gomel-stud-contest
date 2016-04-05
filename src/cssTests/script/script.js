@@ -192,7 +192,9 @@ $(function (){
 		// hideHtmlBlock();
 		// $('.selector').val("");
 		clearInterval(intervalId);
-		location.replace('/readyQuiz');
+		setTimeout(function(){
+			location.replace('/readyQuiz');
+		}, 500);
 	}
 
 	var checkForWelldone = function (selector){
@@ -205,10 +207,10 @@ $(function (){
 				}
 			}
 			if (needed.length == $('.selected').length && forbiddenFlag) {
-				time = (new Date() - startTime)/1000
+				time = (new Date() - startTime)/1000;
 				console.log(time);
 				clearInterval(intervalId);
-				emitEvent(taskId, time, selector, true)
+				emitEvent(taskId, time, selector, true);
 				return true;
 			} else {
 				return false;
@@ -248,7 +250,7 @@ $(function (){
 			console.log(e);
 		}
 		if (checkForWelldone(selector)) {
-			completeTask()
+			completeTask();
 		}
 	};
 

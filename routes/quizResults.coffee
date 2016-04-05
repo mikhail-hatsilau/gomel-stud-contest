@@ -44,7 +44,7 @@ module.exports = (next) ->
 
     user.tasks[task.id] = taskInfo
 
-  resp = yield db.getTasks QUIZ_STEP_ID
+  resp = yield db.getActiveTasks QUIZ_STEP_ID
   rows = resp[0]
 
   allTasks = rows.map (element) ->

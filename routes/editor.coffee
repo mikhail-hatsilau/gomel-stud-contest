@@ -24,11 +24,8 @@ module.exports.next = (next) ->
   FIRST_STEP_ID = 1
   taskNumber = parseInt this.params.task
 
-  loop
-    resp = yield db.getTaskByDisplayNumber taskNumber, FIRST_STEP_ID
-    rows = resp[0]
-    taskNumber++
-    break if not rows.length or rows[0].active
+  resp = yield db.getActiveTaskByDisplayNumber taskNumber, FIRST_STEP_ID
+  rows = resp[0]
 
   if not rows.length
     this.response.status = 404
@@ -36,6 +33,12 @@ module.exports.next = (next) ->
       status: 'error'
       message: 'No such task'
     return
+
+  # loop
+  #   resp = yield db.getTaskByDisplayNumber taskNumber, FIRST_STEP_ID
+  #   rows = resp[0]
+  #   taskNumber++
+  #   break if not rows.length or rows[0].active
 
   task = new FirstStepTask(
     rows[0].id,
@@ -57,7 +60,7 @@ module.exports.next = (next) ->
 
   this.body =
     task: task
-    taskNumber: taskNumber
+    nextTaskExists: !!rows[1]
 
 module.exports.passForm = (next) ->
   QUIZ_WAIT_TIME_OPTION = 'quizWaitingTime'
@@ -75,7 +78,8 @@ module.exports.passForm = (next) ->
     if requestBody.firstName is currentUser.firstName and 
     requestBody.lastName is currentUser.lastName
       this.body =
-        message: 'Wait until css quiz starts.'
+        status: 'ok'
+        message: 'You successfully passed the form. You will be redirected to the home page in 30 seconds.'
     else
       this.status = 403
       this.body = [{error: 'No such user!'}]

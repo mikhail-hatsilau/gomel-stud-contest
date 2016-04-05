@@ -54,7 +54,7 @@ module.exports.results = (next) ->
 
     user.tasks[task.id] = taskInfo
 
-  resp = yield db.getTasks FIRST_STEP_ID
+  resp = yield db.getActiveTasks FIRST_STEP_ID
   rows = resp[0]
 
   rows.sort (a, b) ->

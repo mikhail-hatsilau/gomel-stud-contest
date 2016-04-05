@@ -37,7 +37,7 @@ module.exports.marks = (next) ->
   tasks.step1 = []
   tasks.step2 = []
 
-  resp = yield db.getTasks FIRST_STEP_ID
+  resp = yield db.getActiveTasks FIRST_STEP_ID
   rows = resp[0]
 
   for row in rows
@@ -53,7 +53,7 @@ module.exports.marks = (next) ->
     )
     tasks.step1.push task
 
-  resp = yield db.getTasks QUIZ_STEP_ID
+  resp = yield db.getActiveTasks QUIZ_STEP_ID
   rows = resp[0]
 
   for row in rows

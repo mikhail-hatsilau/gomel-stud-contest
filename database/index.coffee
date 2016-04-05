@@ -157,12 +157,21 @@ module.exports.addQuizStepTask = (taskName, displayNumber, weight, answares, dep
   "VALUE(?,?,?,#{QUIZ_STEP_ID},?,?,?);"
   connection.query QUERY, [taskName, displayNumber, weight, htmlCode, answares, deprecatedSelectors]
 
+module.exports.getQuizStepResultsOfUser = (userId) ->
+  QUERY = "SELECT * FROM #{QUIZ_TABLE} WHERE stud_id = ?;"
+  co ->
+    yield connection.query QUERY, [userId]
+
 module.exports.getTask = (taskId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
   connection.query QUERY, [taskId]
 
 module.exports.getTaskByDisplayNumber = (displayNumber, stepId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE displayNumber = ? AND step_id = ?;"
+  connection.query QUERY, [displayNumber, stepId]
+
+module.exports.getActiveTaskByDisplayNumber = (displayNumber, stepId) ->
+  QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE displayNumber >= ? AND step_id = ? AND active = true;"
   connection.query QUERY, [displayNumber, stepId]
 
 module.exports.getTaskById = (taskId) ->
@@ -187,6 +196,10 @@ module.exports.activateTask = (taskId, active) ->
   QUERY = "UPDATE #{TASKS_TABLE} SET active = ? WHERE id = ?;"
   connection.query QUERY, [active, taskId]
 
+module.exports.clearFirstStep = ->
+  QUERY = "DELETE FROM #{FIRST_STEP_TABLE};"
+  co ->
+    yield connection.query QUERY
 # module.exports.getSettings = ->
 #   QUERY = "SELECT * FROM #{SETTINGS_TABLE};"
 #   connection.query QUERY

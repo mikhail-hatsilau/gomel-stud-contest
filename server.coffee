@@ -92,7 +92,14 @@ io.on 'connection', (socket) ->
 
   socket.on 'ready', ->
     socket.join 'ready room'
-    io.to('admin room').emit 'add user', socket.request.user
+
+    db.getQuizStepResultsOfUser socket.request.user.id
+      .then (resp) ->
+        rows = resp[0]
+        io.to('admin room').emit 'add user', {
+          user: socket.request.user,
+          results: rows
+        }
 
   # socket.on 'begin', (time, callback) ->
   #   # io.to 'ready room'
@@ -117,8 +124,10 @@ io.on 'connection', (socket) ->
     callback()
 
   socket.on 'pass test', (data) ->
-    data.user = socket.request.user
-    io.to('admin room').emit 'test passed', data
+    io.to('admin room').emit 'test passed', {
+      results: data,
+      user: socket.request.user
+    }
     db.getQuizResults socket.request.user.id, data.taskId
       .then (resp) ->
         rows = resp[0]
@@ -135,5 +144,6 @@ io.on 'connection', (socket) ->
 
   socket.on 'start step1', ->
     io.to('students room').emit 'start first step'
+    db.clearFirstStep()
   
 httpServer.listen config.get('port')

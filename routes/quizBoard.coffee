@@ -42,6 +42,5 @@ module.exports = (next) ->
     )
 
   yield this.render 'quizBoard', { 
-    allTasks: allTasks,
-    users: users
+    allTasks: allTasks
   }

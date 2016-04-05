@@ -9,21 +9,28 @@ block content
     table.mui-table.mui-table--bordered
       thead
         tr
-          th Participant
+          th(rowspan=2) Participant
+          each task in allTasks
+            th(colspan=3)= task.name
+              //- div= task.name
+              //- div
+              //-   //- div(data-col= ++colNumber) Weight
+              //-   //-   button.js-sort Sort
+              //-   div(data-col= ++colNumber) Time
+              //-     button.js-sort Sort
+              //-   div(data-col= ++colNumber) Selector
+              //-   div(data-col= ++colNumber) Length
+              //-     button.js-sort Sort
+          th(data-col= 3 * allTasks.length + 1, rowspan=2) Total
+            button.js-sort Sort
+        tr
           - var colNumber = 0
           each task in allTasks
-            th(colspan="4")
-              div= task.name
-              div
-                div(data-col= ++colNumber) Weight
-                  button.js-sort Sort
-                div(data-col= ++colNumber) Time
-                  button.js-sort Sort
-                div(data-col= ++colNumber) Selector
-                div(data-col= ++colNumber) Length
-                  button.js-sort Sort
-          th(data-col= ++colNumber) Total
-            button.js-sort Sort
+            th(data-col= ++colNumber) Time
+              button.js-sort Sort
+            th(data-col= ++colNumber) Selector
+            th(data-col= ++colNumber) Length
+              button.js-sort Sort
       tbody
         each user in users
           tr(data-id=user.id)
@@ -32,15 +39,14 @@ block content
             each task in allTasks
               if user.tasks[task.id]
                 - totalTime += user.tasks[task.id].time
-                td
-                  span.sort-item= user.tasks[task.id].task.weight
+                //- td
+                //-   span.sort-item= user.tasks[task.id].task.weight
                 td
                   span.sort-item= user.tasks[task.id].time
                 td= user.tasks[task.id].selector
                 td
                   span.sort-item= user.tasks[task.id].selector.length
               else
-                td
                 td
                 td
                 td

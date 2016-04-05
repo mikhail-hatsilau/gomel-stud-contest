@@ -79,17 +79,18 @@ showTask = (task) ->
 loadTask = ->
   $.get "/next/#{taskNumber}"
     .done (resp) ->
-      # nextTaskBtn = $('.next-task')
+      nextTaskBtn = $('.next-task')
 
-      # if resp.next
-      #   nextTaskBtn.show()
-      # else
-      #   nextTaskBtn.hide()
+      if resp.nextTaskExists
+        nextTaskBtn.show()
+      else
+        nextTaskBtn.hide()
 
       taskId = resp.task.id
-      taskNumber = resp.taskNumber
+      taskNumber = resp.task.displayNumber
 
       setLocalStorage 'taskNumber', taskNumber
+      taskNumber++
 
       task =
         htmlCode: resp.task.htmlCode
@@ -139,15 +140,23 @@ submitFrameForm = (action) ->
   }
     .done (resp) ->
       # QUIZ_ROUTE = '/quiz'
-      # body = $(that).parent 'body'
-      # contentBlock = $('<div class="frame-info"/>')
-      # contentBlock.append $('<div class="message"/>').text(resp.message)
-      # contentBlock.append $('<div class="timer"/>')
-      # body.empty()
-      # body.append contentBlock
+      waitTime = 30
+      body = $(that).parent 'body'
+      contentBlock = $('<div class="frame-info"/>')
+      timerElement = $('<div class="timer"/>')
+      contentBlock.append $('<div class="message"/>').text(resp.message)
+      contentBlock.append timerElement
+      body.empty()
+      body.append contentBlock
       saveTaskResults()
-      # socketIo.emit 'ready to start'
-      location.href = '/readyQuiz'
+      clearLocalStorageItem 'taskNumber'
+      timerElement.text parseTime(waitTime)
+      waitRedirectInterval = setInterval( ->
+        timerElement.text parseTime(--waitTime)
+        if waitTime is 0
+          clearInterval waitRedirectInterval
+          location.replace '/'
+      , 1000)
 
     .error (xhr) ->
       $(that).find('.error').remove()

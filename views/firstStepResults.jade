@@ -9,18 +9,25 @@ block content
     table.mui-table.mui-table--bordered.first-step
       thead
         tr
-          th Participant
+          th(rowspan=2) Participant
+          each task in allTasks
+            th(colspan=2)= task.name
+            //-   div= task.name
+            //-   div
+            //-     div(data-col= 2 * colNumber + 1) Time
+            //-       button.js-sort Sort
+            //-     div Result file
+            //- - colNumber++
+          th(data-col= 2 * allTasks.length + 1, rowspan=2) Total
+            button.js-sort Sort
+        tr
           - var colNumber = 0
           each task in allTasks
-            th(colspan=2)
-              div= task.name
-              div
-                div(data-col= 2 * colNumber + 1) Time
-                  button.js-sort Sort
-                div Result file
+            th(data-col= 2 * colNumber + 1) Time
+              button.js-sort Sort
+            th Result file
             - colNumber++
-          th(data-col= 2 * colNumber + 1) Total
-            button.js-sort Sort
+
       tbody
         each user in users
           tr(data-id=user.id)

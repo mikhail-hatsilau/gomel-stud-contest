@@ -125,8 +125,14 @@ module.exports.activateTask = (next) ->
   taskId = this.request.body.taskId
   active = if this.request.body.active is 'true' then true else false
 
-  yield db.activateTask taskId, active
-
-  this.body =
-    status: 'ok'
+  try
+    yield db.activateTask taskId, active
+    this.body =
+      status: 'ok'
+      message: 'Active state has been changed'
+  catch error
+    this.response.status = 500
+    this.body = 
+      status: 'error'
+      message: 'Error occured'
 
