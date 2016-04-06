@@ -1,5 +1,6 @@
 router = do require 'koa-router'
 session = require 'koa-session'
+passport = require 'koa-passport'
 checkAuth = require '../middleware/checkAuth'
 adminAccess = require '../middleware/adminAccess'
 

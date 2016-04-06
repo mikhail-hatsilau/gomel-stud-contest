@@ -13,8 +13,8 @@ module.exports.save = (next) ->
   htmlCode = this.request.body.htmlCode
   cssCode = this.request.body.cssCode
 
-  pathToFile = utils.getFilePath this.session.user.id, this.session.user.username, taskId
-  yield db.saveFirstStepResults this.session.user.id, taskId, time, htmlCode, cssCode, pathToFile
+  pathToFile = utils.getFilePath this.req.user.id, this.req.user.username, taskId
+  yield db.saveFirstStepResults this.req.user.id, taskId, time, htmlCode, cssCode, pathToFile
 
   this.body = {
     status: 'ok'
@@ -73,7 +73,7 @@ module.exports.passForm = (next) ->
     this.status = 400
     this.body = this.errors
   else
-    currentUser = this.session.user
+    currentUser = this.req.user
     this.session.passedForm = true
     if requestBody.firstName is currentUser.firstName and 
     requestBody.lastName is currentUser.lastName

@@ -13,7 +13,7 @@ module.exports.get = (next) ->
 
 module.exports.quiz = (next) ->
   taskId = this.params.taskId
-  userId = this.session.user.id
+  userId = this.req.user.id
 
   # resp = yield db.quizResultsOfStudent taskId, userId
 

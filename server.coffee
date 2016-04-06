@@ -1,6 +1,7 @@
 koa = require 'koa'
 serve = require 'koa-static'
-koaBody = do require 'koa-body'
+koaBody = do require 'koa-bodyparser'
+passport = require 'koa-passport'
 json = require 'koa-json'
 validate = require 'koa-validate'
 path = require 'path'
@@ -10,8 +11,11 @@ views = require 'koa-views'
 http = require 'http'
 socket = require 'socket.io'
 cookie = require 'cookie'
+session = require 'koa-session'
 db = require './database'
 QuizStepTask = require './models/quizStepTask'
+Role = require './models/role'
+User = require './models/user'
 
 app = koa()
 httpServer = http.createServer app.callback()
@@ -21,10 +25,17 @@ app.use json()
 app.use koaBody
 app.use validate()
 app.keys = ['contest']
+# app.use session(app)
 
 app.use(views path.join(__dirname, '/views') , {
   extension: 'jade'
 })
+
+db.createConnection()
+
+require './auth'
+app.use passport.initialize()
+app.use passport.session()
 
 app.use (next) ->
   try
@@ -38,14 +49,12 @@ app.use (next) ->
     }
 
 app.use (next) ->
-  this.state.user = this.session.user
+  this.state.user = this.req.user
   yield next
 
 router(app)
 
 app.use serve(path.join __dirname, '/dist' )
-
-db.createConnection()
 
 getTasks = (rows) ->
   tasks = for row in rows
@@ -70,10 +79,13 @@ io.use (socket, next) ->
   if handShakeData.headers.cookie && handShakeData.headers.cookie.indexOf('koa:sess') > -1
     cookieData = cookie.parse(handShakeData.headers.cookie)['koa:sess']
     parsedUser = JSON.parse(new Buffer(cookieData, 'base64'))
-    handShakeData.user = parsedUser.user
+    if parsedUser.passport.user is undefined
+      next new Error('Not authorized')
+      return
+    handShakeData.user = parsedUser.passport.user
     next()
   else
-    next(new Error('Not authorized'))
+    next new Error('Not authorized')
 
 io.on 'connection', (socket) ->
   if socket.request.user.role.name is 'admin'
@@ -145,5 +157,11 @@ io.on 'connection', (socket) ->
   socket.on 'start step1', ->
     io.to('students room').emit 'start first step'
     db.clearFirstStep()
+
+app.use (next) ->
+  yield this.render 'error', {
+    errorStatus: 404,
+    errorMessage: 'The page not found'
+  }
   
 httpServer.listen config.get('port')

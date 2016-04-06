@@ -1,5 +1,4 @@
 module.exports = (next) ->
   yield next
-
-  this.session = null
+  this.logout()
   this.redirect '/'

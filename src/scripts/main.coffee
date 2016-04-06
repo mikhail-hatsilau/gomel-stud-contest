@@ -48,9 +48,10 @@ $('.sign-in').on 'submit', (event) ->
     data: $(this).serialize()
   }
     .done ->
+      console.log('submitted')
       location.href = '/'
     .fail (xhr) ->
-      serverErrorElement.text xhr.responseJSON.error
+      serverErrorElement.text xhr.responseJSON.message
 
 initRemoveConfirmDialog = ->
   dialog = $('#removeConfirmationDialog').dialog {

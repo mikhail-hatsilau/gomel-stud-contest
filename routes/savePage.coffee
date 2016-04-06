@@ -8,7 +8,7 @@ module.exports.post = (next) ->
   css = requestBody.cssContent || ''
   script = requestBody.scriptContent || ''
 
-  path = utils.saveFile html, css, script, this.session.user.id, this.session.user.username, requestBody.taskId
+  path = utils.saveFile html, css, script, this.req.user.id, this.req.user.username, requestBody.taskId
 
   this.body =
     status: 'ok'
@@ -22,7 +22,7 @@ module.exports.postAdmin = (next) ->
   css = requestBody.cssContent || ''
   script = requestBody.scriptContent || ''
 
-  path = utils.saveFileAdmin html, css, script, this.session.user.id, this.session.user.username
+  path = utils.saveFileAdmin html, css, script, this.req.user.id, this.req.user.username
 
   this.body =
     status: 'ok'
