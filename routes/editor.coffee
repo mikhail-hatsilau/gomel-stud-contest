@@ -5,7 +5,7 @@ FirstStepTask = require '../models/firstStepTask'
 module.exports.get = (next) ->
   # if this.session.passedQuiz
   #   this.throw 'Forbidden', 403
-  yield this.render 'editor', { editorPage: true }
+  yield this.render 'editor', { contentClass: 'editor-page' }
 
 module.exports.save = (next) ->
   taskId = this.request.body.taskId

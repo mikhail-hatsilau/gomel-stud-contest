@@ -29,14 +29,14 @@ gulp.task 'scripts', ->
     )
     .pipe gulp.dest DEST
 
-  gulp.src './src/cssTests/script/*.js', { read: false }
+  gulp.src './src/scripts/*.js', { read: false }
     .pipe browserify({
         extensions: ['.js']
     })
     .pipe rename((path) ->
       path.extname = '.js'
     )
-    .pipe gulp.dest DEST + '/cssTests/script/'
+    .pipe gulp.dest DEST + 'scripts/'
 
 gulp.task 'server:start', ->
   server.listen {path: './server.coffee'}
@@ -46,10 +46,10 @@ gulp.task 'copy', ->
     .pipe gulp.dest DEST + 'cssTests/css'
   gulp.src './node_modules/font-awesome/fonts/*'
     .pipe gulp.dest DEST + 'fonts/'
-  gulp.src './src/tasks/*'
-    .pipe gulp.dest DEST + 'tasks/'
-    gulp.src './node_modules/jquery-ui/themes/vader/jquery-ui.min.css*'
+  gulp.src './node_modules/jquery-ui/themes/vader/jquery-ui.min.css*'
     .pipe gulp.dest DEST + 'styles/lib/'
+  gulp.src './src/images/*'
+    .pipe gulp.dest DEST + 'images/'
 
 gulp.task 'watch', ->
   gulp.watch './src/**/*.jade', ['jade']

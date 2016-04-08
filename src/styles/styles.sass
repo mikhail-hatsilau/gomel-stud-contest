@@ -1,80 +1,250 @@
 @import node_modules/font-awesome/scss/font-awesome
+@import url(https://fonts.googleapis.com/css?family=Oswald)
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300)
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300)
+
 @import node_modules/muicss/lib/sass/mui-colors
 
 $mui-primary-color: mui-color('teal', '500')
 
 @import node_modules/muicss/lib/sass/mui
 
-$footer-height: 60px
+$header-height: 60px
 $content-padding: 20px
+$container-width: 960px
+$font-family-oswald: 'Oswald', helvetica, sans-serif, arial
+$font-family-source-sans-pro: 'Source Sans Pro', helvetica, sans-serif, arial
+$roboto-font-family: 'Roboto', helvetica, sans-serif, arial
+$dark-green-color: #7F993A
+$lime-green-color: #A3C644
+$popup-background-color: #E6E6E5
+$background-color: #E4E4E4
+$border-color: #CCC
+$editors-border-color: #C3D2D4
+$warning-color: #B22746
+$header-text-color: #393D2E
+$light-blue-color: #1A9CB0
+$dark-blue-color: #063C44
+$task-color: #576061
+$placeholder-color: #AFAFAF
 
 html, body
   margin: 0
   padding: 0
-  height: 100%
 
-.wrapper
-  min-height: 100%
-  padding-bottom: 70px
-  box-sizing: border-box
+body
+  background: $background-color
+
+:-webkit-input-placeholder
+  color: $placeholder-color
+
+:-moz-placeholder
+  color: $placeholder-color
+
+:-moz-placeholder
+  color: $placeholder-color
+
+:-ms-input-placeholder
+  color: $placeholder-color
+
+#main-page
+  background: url("/images/background.png") no-repeat center center fixed
+  background-size: cover
 
 .header
-  .brand
-    color: $mui-appbar-font-color
-    text-decoration: none
-    display: inline-block
-    padding: 0 20px
-    font-size: 20px
-    vertical-align: middle
+  height: $header-height
+  background: white
+  min-width: $container-width
 
-  >ul
-    list-style: none
-    display: inline-block
-    vertical-align: middle
-    >li
-      float: left 
-      >a
-        color: $mui-appbar-font-color
-        text-decoration: none
-        display: inline-block
-        padding: 0 20px
+  .container
+    line-height: $header-height
+    
+    a
+      text-decoration: none
+      color: black
+      font-family: $font-family-oswald
 
-.content
-  padding: 20px
+    .brand, .logout-section a
+      text-transform: uppercase
+      display: inline-block
+      color: $header-text-color
+      line-height: $header-height
+      vertical-align: top
 
-.wrapper.editor-page
-  height: 1px
+    .brand
+      height: $header-height
+      font-size: 25px
+      padding-right: 20px
 
-  .content
+    .logout-section
+      a
+        font-size: 16px
+        margin-left: 40px
+
+        &:hover
+          text-decoration: underline
+
+      .user
+        font-family: $font-family-oswald
+        font-size: 14px
+
+    >ul, >div
+      vertical-align: top
+      display: inline-block
+      height: $header-height
+
+    >ul
+      >li
+        float: left
+        a
+          display: inline-block
+          height: $header-height
+          line-height: $header-height
+          padding: 0 20px
+          text-transform: uppercase
+
+          &:hover
+            text-decoration: underline
+      >li
+        .dropdown-menu
+          display: none
+          background: white
+          position: absolute
+          top: $header-height + 2px
+          z-index: 10
+
+          a
+            width: 150px
+            text-align: center
+
+      .dropdown
+        position: relative
+
+.container
+  width: $container-width
+  margin: 0 auto
+  position: relative
+
+ul
+  list-style: none
+  padding: 0
+  margin: 0
+
+.right
+  float: right
+
+.caret
+  display: inline-block
+  vertical-align: middle
+  margin-left: 5px
+  border-top: 5px solid $header-text-color
+  border-left: 5px solid transparent
+  border-right: 5px solid transparent
+
+.start-info, .start-info-logged
+  text-align: center
+  color: white
+  font-family: $font-family-oswald
+  font-size: 48px
+
+.start-info-logged
+  margin-top: 191px
+
+.start-info
+  margin-top: 173px
+  div
+    margin-bottom: 48px
+
+.btn
+  display: inline-block
+  border: none
+  font-family: $font-family-oswald
+  line-height: 1em
+  padding: 16px 48px 15px 47px
+  font-size: 18px
+  text-transform: uppercase
+  cursor: pointer
+
+.btn-dark-green
+  @extend .btn
+  color: white
+  background: $dark-green-color
+
+  &:hover
+    background: $lime-green-color
+
+.btn-light-blue
+  @extend .btn
+  color: white
+  background: $light-blue-color
+
+  &:hover
+    background: #137B8B
+
+.btn-dark-blue
+  @extend .btn
+  color: white
+  background: $dark-blue-color
+
+  &:hover
+    background: #137B8B
+
+.content.editor-page
+  position: absolute
+  top: $header-height
+  bottom: 0
+  left: 0
+  right: 0
+
+  .container
     height: 100%
-    box-sizing: border-box
-    position: relative
 
-.footer
-  height: 60px
-  margin-top: -61px
-  background-color: #e0e0e0
-  border-top: 1px solid #bdbdbd
-  line-height: 60px
-  padding-left: 20px
-  font-size: 12px
+.timer
+  display: inline-block
+  background: $light-blue-color
+  padding: 12px 0
+  width: 55px
+  text-align: center
+  line-height: 1em
+  font-size: 16px
+  color: white
+  font-family: $font-family-oswald
+  margin-left: 24px
+  transition: background 0.5s
 
-.bar>div,
-iframe
-  height: 100%
+.show-task, .next-task
+  font-size: 16px
+  padding: 12px 24px
+
+.controls
+  height: 90px
+  width: $container-width
+  display: table-cell
+  vertical-align: middle
+
+.bar
+  .editors, .results, iframe
+    height: 100%
+
+  .editors, .results
+    background: white
+    border: 1px solid $editors-border-color
+
+  .editors
+    border-right: 0
 
 .bar
   position: absolute
-  top: $content-padding
-  bottom: 70px
-  left: $content-padding
-  right: $content-padding
+  top: 90px
+  bottom: 24px
+  left: 0
+  right: 0
+  box-sizing: border-box
 
 .clearfix:after
   content: " "
   display: table
   clear: both
-
 
 iframe
   width: 100%
@@ -86,16 +256,12 @@ div.editor
   height: 50%
 
 div.editor:first-of-type
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3)
+  border-bottom: 1px solid $editors-border-color
   box-sizing: border-box
 
 div.editor:only-child
   height: 100%
   border: none
-
-ul
-  margin: 0
-  padding: 0
 
 .horizontal-divider
   position: absolute
@@ -110,8 +276,8 @@ ul
 .vertical-divider
   cursor: ew-resize
   position: absolute
-  top: 0
-  bottom: 0
+  top: 90px
+  bottom: 24px
   left: 50%
   width: 8px
   margin-left: -4px
@@ -124,9 +290,30 @@ ul
 .editors
   position: relative
 
+.editor
+  position: relative
+
+.editor-name-hint
+  position: absolute
+  right: 12px 
+  top: 12px
+  background: rgba(255, 255, 255, 0.5)
+  font-family: $font-family-source-sans-pro
+  font-size: 14.7px
+  color: #ADBFC2
+  line-height: 1em
+
+#editorHtml:after
+  content: "HTML"
+  @extend .editor-name-hint
+
+#editorCss:after
+  content: "CSS"
+  @extend .editor-name-hint
+
 .results
   position: relative
-  border-left: 1px solid rgba(0, 0, 0, 0.3)
+  border-left: 1px solid $editors-border-color
   box-sizing: border-box
 
   .overlayer
@@ -136,16 +323,8 @@ ul
     bottom: 0
     right: 0
 
-.right
-  float: right
-
 .left
   float: left
-
-.next-task
-  position: absolute
-  bottom: 10px
-  right: 10px
 
 .to-do-block
   position: fixed
@@ -155,14 +334,6 @@ ul
   z-index: 5
   color: white
   padding: 20px
-
-//****Popup****
-
-.task-popup
-  height: 200px
-  width: 400px
-
-//****End popup****
 
 .round-btn
   background-color: black
@@ -214,9 +385,118 @@ a.edit-btn
 .total-results-first-step
   margin-bottom: 20px
 
+//Login popup
+.ui-dialog.login-dialog
+  .ui-dialog-titlebar
+    display: none
+
+#login-popup
+  padding: 0
+
+  form
+    background: $popup-background-color
+    padding: 24px
+  
+    .message, .server-error
+      font-size: 16px
+      font-family: $font-family-source-sans-pro
+
+    .message
+      margin: 0 0 24px
+      color: #5F5F5F
+
+    .server-error
+      margin: 24px 0
+      color: $warning-color
+    
+    .form-element
+      margin: 24px 0
+      position: relative
+
+      &:last-child
+        margin-bottom: 0
+
+      input
+        width: 100%
+        border-radius: 0
+        border: 1px solid $border-color
+        padding: 11px 50px 11px 12px
+        font-size: 16px
+        font-family: $font-family-source-sans-pro
+
+      button[type="submit"]
+        width: 100%
+        font-family: $font-family-oswald
+        font-size: 18px
+
+    .username:after, .password:after
+      position: absolute
+      top: 10px
+      right: 15px 
+      content: " "
+      height: 25px
+      width: 25px
+      background: url("/images/icons.png")
+    
+    .username:after
+      background-position: -2px
+
+    .password:after
+      background-position: 25px
+
+.login-popup-title
+  text-align: center
+  background: #5F732C
+  img
+    height: 50px
+    display: inline-block
+    margin: 24px
+
+// Task popup
+.ui-dialog.task
+  border: 1px solid $editors-border-color
+
+  .ui-dialog-titlebar-close
+    display: block
+    right: 24px
+    background: transparent
+    border: none
+    outline: none
+
+    &:focus, &:active
+      border: none
+      outline: none
+
+    &:after
+      content: '×'
+      font-family: $roboto-font-family
+      color: $editors-border-color
+      font-size: 28.7px
+      position: absolute
+      top: -5px
+      right: 0
+
+  .ui-dialog-titlebar
+    padding: 24px
+    border-bottom: 1px solid $editors-border-color
+    font-size: 18.7px
+    color: $task-color
+    font-weight: 300
+
+  .ui-dialog-content
+    padding: 14px 24px 24px
+    font-size: 16px
+    font-family: $roboto-font-family
+    color: $task-color
+    font-weight: 300
+
 // Popup
+.popup
+  display: none
+
 .ui-widget-overlay
-  background-color: rgba(0, 0, 0, 0.8)
+  background-color: black
+  opacity: 0.5
 
 .ui-dialog, .ui-dialog-titlebar, .ui-dialog-buttonpane
   background-color: white
@@ -227,8 +507,9 @@ a.edit-btn
 .ui-widget-content, .ui-dialog-titlebar
   color: black
 
-.ui-dialog .ui-dialog-titlebar-close
-  display: none
+.ui-dialog 
+  .ui-dialog-titlebar-close
+    display: none
 
 .ui-dialog
   .ui-dialog-content
@@ -322,14 +603,6 @@ a.edit-btn
           display: inline-block
           width: 100%
 
-// Settings page
-.mui-textfield.hide-block
-  display: none
-
-.save-settings 
-  h3
-    border-bottom: 1px solid $mui-divider-color
-
 .load-file
   margin-right: 10px
 
@@ -353,3 +626,151 @@ a.edit-btn
 
     .fa-remove
       color: mui-color('red', '500');
+
+// Waiting quiz page
+.quiz-logo
+  margin: 51px 0
+  text-align: center
+
+.quiz-message
+  font-size: 32px
+  color: #30322C
+  font-family: $font-family-source-sans-pro
+  text-align: center
+  font-weight: 300
+
+// Quiz
+.yellow
+  color: #DCAD3A
+
+.green
+  color: #8DAE52
+
+.red
+  color: #FF517C
+
+.html-wrapper
+  border: 1px solid $editors-border-color
+
+.html-code
+  color: #576061
+  font-family: "Lucida Console", monospace
+  font-size: 16px
+
+  tr
+    background: white
+
+    &:first-child
+      td
+        padding-top: 12px
+
+    &:last-child
+      td
+        padding-bottom: 12px
+
+  td
+    padding: 5px 10px
+    min-width: 15px
+
+    &:first-child
+      padding-left: 12px
+
+  td.line-num
+    color: #aaa
+
+  .flag
+    width: 14px
+    height: 14px
+    border-radius: 50%
+    display: none
+    box-sizing: border-box
+
+  .needed
+    .flag
+      border: 3px solid #26BF26
+      display: block
+
+  .selected
+    .flag
+      display: block
+      background: #FF5E5E
+
+  .needed.selected
+    .flag
+      background: #26BF26
+      border: none
+
+.explanation
+  margin: 12px 0 24px
+  text-align: right
+
+  >div
+    display: inline-block
+    vertical-align: middle
+    margin-right: 24px
+
+    &:last-child
+      margin-right: 0
+
+  .flag
+    width: 14px
+    height: 14px
+    border-radius: 50%
+    box-sizing: border-box
+    display: inline-block
+    margin-right: 12px
+    vertical-align: middle
+
+  .needed-flag
+    @extend .flag
+    border: 3px solid #26BF26
+
+  .incorrect-flag
+    @extend .flag
+    border: none
+    background: #FF5E5E
+
+  .correct-flag
+    @extend .flag
+    border: none
+    background: #26BF26
+
+.code
+  width: 100%
+
+.forbidden
+  background: #8E244D
+  font-family: $font-family-oswald
+  display: inline-block
+  padding: 12px
+  line-height: 1em
+  font-size: 16px
+  color: white
+  text-transform: uppercase
+
+  span
+    margin-left: 12px
+
+.selector
+  padding: 12px
+  outline: none
+  border: 1px solid $editors-border-color
+  color: #576061
+  width: 50%
+
+.forbidden-error
+  color: $warning-color
+  font-family: $font-family-source-sans-pro
+  font-size: 16px
+  display: none
+  margin-top: 12px
+
+.input-wrapper.error
+  input
+    border: 1px solid $warning-color
+
+.timer.red-color
+  background: #B01A36
+
+.quiz-task-info
+  margin: 16px 0 18px

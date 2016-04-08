@@ -7,31 +7,31 @@ html
     link(rel="stylesheet", href="/styles/lib/jquery-ui.min.css")
     link(rel="stylesheet", href="/styles/styles.css")
     block link
-  body
-    .wrapper(class=editorPage ? "editor-page": "")
-      .header.mui-appbar.mui--z3
-        a.brand.mui--appbar-height.mui--appbar-line-height(href="/") GUUC
-        block header
-          ul.mui--appbar-height.mui--appbar-line-height
-            if user
+  body(id= mainPage ? 'main-page': '')
+    if user
+      .header
+        .container
+          a.brand(href="/") Guuc
+          block header
+            ul
               case user.role.name
                 when "admin"
                   li
                     a(href="/marks") Marks
-                  li.mui-dropdown
-                    a(href="#", data-mui-toggle="dropdown") Results
-                      <span class="mui-caret"></span>
-                    ul.mui-dropdown__menu
+                  li.dropdown
+                    a(href="#", data-toggle="dropdown") Results
+                      <span class="caret"></span>
+                    ul.dropdown-menu
                       li
                         a(href="/firstStepResults") Step 1
                       li
                         a(href="/quizResults") Step 2
                   li
                     a(href="/users") Users
-                  li.mui-dropdown
-                    a(href="#", data-mui-toggle="dropdown") Tasks
-                      <span class="mui-caret"></span>
-                    ul.mui-dropdown__menu
+                  li.dropdown
+                    a(href="#", data-toggle="dropdown") Tasks
+                      <span class="caret"></span>
+                    ul.dropdown-menu
                       li
                         a(href="/firstStepTasks") Step 1
                       li
@@ -40,17 +40,13 @@ html
                     a.start-first-step(href="#") Start step 1
                   li
                     a(href="/quizBoard") CSS Quiz board
+          .logout-section.right
+            span.user= user.username
+            a(href="/logout") Logout
 
-        ul.right.mui--appbar-height.mui--appbar-line-height
-          if user
-            li= user.username
-              a(href="/logout") Logout
-          else
-            li
-              a(href="/login") Login
-      .content
-        block content
-    .footer Developed by Mikhail Hatsilau
+    .content(class= contentClass ? contentClass : '')
+      block content
+
     script(src="//cdn.muicss.com/mui-0.4.7/js/mui.min.js")
     script(src="/socket.io/socket.io.js")
     script var socketIo = io()

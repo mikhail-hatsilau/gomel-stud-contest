@@ -3,23 +3,29 @@ extends ./layout/layout
 block title 
   title Quiz
 
-block link
-  link(rel="stylesheet", href="cssTests/css/style.css")
-
 block content
-  .sm-container
-    .forbidden
-      .title Forbidden selectors
-      .data
-    .time
-      .title Time spent
-      .data 00:00
-  .sm-container
+  .container
+    .quiz-task-info
+      .forbidden
+        |Forbidden selectors
+        span.data
+      .timer 00:00
+    .html-wrapper
+      table.html-code(cellspacing="0", cellpadding="0")
+    .explanation
+      div
+        .needed-flag
+        |element to choose
+      div
+        .incorrect-flag
+        |incorrectly chosen
+      div
+        .correct-flag
+        |correctly chosen
     .input-wrapper
-      input.selector(type="text")
-  .html-wrapper(style="left: -2000px; top: -300px; transform: rotate(-90deg) scale(2);")
-    table.html-code(cellspacing="0", cellpadding="0")
+      input.selector(type="text", placeholder="Type your answare")
+      .forbidden-error.
+        You can not use forbidden selectors
 
 block scripts
-  script(src="/cssTests/script/script.js")
-
+  script(src="/scripts/quiz.js")

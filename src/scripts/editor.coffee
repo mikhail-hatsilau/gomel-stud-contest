@@ -1,4 +1,5 @@
 $ = require 'jquery'
+require 'jquery-ui'
 ace = require 'brace'
 _ = require 'lodash'
 require 'brace/mode/html'
@@ -13,10 +14,12 @@ intervalId = undefined
 editorHtml = ace.edit 'editorHtml'
 editorHtml.getSession().setMode 'ace/mode/html'
 editorHtml.session.setOptions { tabSize: 2, useSoftTabs: false }
+editorHtml.setHighlightActiveLine(false);
 
 editorCss = ace.edit 'editorCss'
 editorCss.getSession().setMode 'ace/mode/css'
 editorCss.session.setOptions { tabSize: 2, useSoftTabs: false }
+editorCss.setHighlightActiveLine(false);
 
 setLocalStorage = (key, value) ->
   localStorage.setItem key, value
@@ -26,6 +29,19 @@ getLocalStorage = (key) ->
 
 clearLocalStorageItem = (key) ->
   localStorage.removeItem key
+
+
+initTaskDialog = ->
+  dialog = $('#task-dialog').dialog {
+    autoOpen: false,
+    modal: true,
+    width: 824,
+    resizable: false,
+    draggable: false,
+    dialogClass: 'task'
+  }
+
+taskDialog = initTaskDialog()
 
 taskId = -1
 taskNumber = getLocalStorage('taskNumber') || 1
@@ -64,9 +80,10 @@ showTask = (task) ->
   cssCode = getLocalStorage('cssCode') || task.cssCode
   editorHtml.setValue htmlCode, -1
   editorCss.setValue cssCode, -1
-  toDoBlock = $('.to-do-block')
+  toDoBlock = $('.to-do-section')
   toDoBlock.empty()
   toDoBlock.html task.toDo
+  $('.ui-dialog-title').text task.name
   $('.js-result').attr 'src', ''
   time = getLocalStorage('firstStepStartTime') || 0
   timer = $('.timer')
@@ -96,13 +113,14 @@ loadTask = ->
         htmlCode: resp.task.htmlCode
         cssCode: resp.task.cssCode
         toDo: resp.task.toDo
+        name: resp.task.name
 
       showTask(task)
     .fail (xhr) ->
       console.log 'Error occured'
 
 saveTaskResults = () ->
-  $.post '/saveTaskResults', { 
+  $.post '/saveTaskResults', {
     taskId: taskId,
     time: time,
     htmlCode: editorHtml.getValue(),
@@ -164,15 +182,15 @@ submitFrameForm = (action) ->
         for own key, value of error
           errorDiv = $('<div>').addClass 'error'
           $(that).append errorDiv.text value
-  
+
 loadTask()
 
 $('.next-task').on 'click', ->
   saveTaskResults()
 
+$('.show-task').on 'click', ->
+  taskDialog.dialog 'open'
+
 editor.on 'editorResize', ->
   editorHtml.resize()
   editorCss.resize()
-
-
-

@@ -4,7 +4,10 @@ block title
   title Quiz
 
 block content
-  h2 CSS Quick Draw
+  .quiz-logo
+    img(src="/images/cowboy.png", alt="")
+  .quiz-message.
+    Keep calm, cowboy. We are waiting for others
 
 block scripts
   script socketIo.emit('ready');

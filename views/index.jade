@@ -1,5 +1,18 @@
 extends ./layout/layout.jade
 
 block content
-  div.
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore aliquid nemo enim, placeat, voluptatem nihil amet ex assumenda! Cumque placeat ex iure alias, fuga, nesciunt obcaecati rerum deserunt cupiditate reprehenderit.
+  if !user
+    .start-info
+      .logo
+        img(src="/images/GUUC_Logo.png", alt="")
+      .description.
+        The first Gomel UI/UXD Competition for students
+      button.btn-login.btn-dark-green Login
+  else
+    .start-info-logged
+      | We are about to begin, be ready, stay cool
+      <br>
+      |Good Luck
+
+  #login-popup.popup
+    include ./includes/loginPopup

@@ -132,12 +132,12 @@ $(function (){
 			if(savedTime) {
 				startTime.setSeconds(startTime.getSeconds() - savedTime);
 			}
-			$('.time .data').html('00:00');
+			$('.timer').html('00:00');
 			timer = savedTime || 0;
 			intervalId = setInterval(function (){
 				timer++;
 				localStorage.setItem('quizTime', timer);
-				simpleTimer($('.time .data'), timeLimit);
+				simpleTimer($('.timer'), timeLimit);
 				if (timeLimit && timer >= timeLimit) {
 					emitEvent(taskId, timeLimit, '', false);
 					completeTask();
@@ -146,14 +146,14 @@ $(function (){
 			forbiddenFlag = true;
 			$('.html-code').html("");
 			var lines = data.htmlCode.split("\n");
-			console.log(lines[1]);
 			var needed = data.answares.split(",").map(Number);
 			if (data.deprecatedSelectors.trim().length === 0) {
 				forbidden = []
 			} else {
 				forbidden = data.deprecatedSelectors.split(' ');
 			}
-			$('.forbidden .data').html(data.deprecatedSelectors);
+			console.log(forbidden.join('&nbsp'));
+			$('.forbidden .data').html(forbidden.join('&nbsp&nbsp&nbsp'));
 			rootNode = $("<div/>");
 			rootNode.append(data.htmlCode);
 			$(rootNode).find('*').each(function (index){
@@ -234,11 +234,13 @@ $(function (){
 		try {
 			for (var i = 0; i < forbidden.length; i++) {
 				if (selector.indexOf(forbidden[i]) != -1) {
-					$('.forbidden').addClass('error');
+					$('.input-wrapper').addClass('error');
+					$('.forbidden-error').show()
 					forbiddenFlag = false;
 					break;
 				} else {
-					$('.forbidden').removeClass('error');
+					$('.input-wrapper').removeClass('error');
+					$('.forbidden-error').hide()
 					forbiddenFlag = true;
 				}
 			}

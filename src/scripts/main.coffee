@@ -61,8 +61,29 @@ initRemoveConfirmDialog = ->
     resizable: false
   }
 
-removeConfirmationDialog = initRemoveConfirmDialog()
+initLoginDialog = ->
+  dialog = $('#login-popup').dialog {
+    autoOpen: false,
+    modal: true,
+    width: 344,
+    resizable: false,
+    dialogClass: 'login-dialog'
+  }
 
+removeConfirmationDialog = initRemoveConfirmDialog()
+loginDialog = initLoginDialog()
+
+$('.btn-login').on 'click', ->
+  loginDialog.dialog 'open'
+
+$(document).on 'click', (event) ->
+  $('.dropdown-menu').slideUp()
+
+$('a[data-toggle="dropdown"]').on 'click', (event) ->
+  # $('.dropdown-menu').slideUp()
+  dropdownMenu = $(this).next '.dropdown-menu'
+  dropdownMenu.slideToggle()
+  event.stopPropagation()
 
 addUser = (form) ->
   # removeValidationErrors $(form)

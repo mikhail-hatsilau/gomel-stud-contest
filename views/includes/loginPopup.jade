@@ -1,0 +1,11 @@
+.login-popup-title
+  img(src="/images/GUUC_Logo.png", alt="")
+form.sign-in(action="/login" method="POST")
+  .message We are ready to begin, waiting just for you
+  .form-element.username
+    input(type="text", name="username", placeholder="Username")
+  .form-element.password
+    input(type="password", name="password", placeholder="Password")
+  .server-error
+  .form-element
+    button.btn-dark-green(type="submit") Login

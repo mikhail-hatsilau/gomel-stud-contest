@@ -4,21 +4,24 @@ block title
   title Step 1
 
 block content
-  .bar.clearfix
-    .editors
-      .editor#editorHtml
-      .horizontal-divider
-      .editor#editorCss
-    .vertical-divider
-    .results
-      iframe(
-        frameborder="0",
-        class="js-result",
-        sandbox="allow-forms allow-same-origin allow-scripts")
-    button.mui-btn.mui-btn--fab.mui-btn--primary.next-task Next
-
-  .to-do-block
-  .timer
+  .container
+    .controls.clearfix
+      button.btn-dark-blue.show-task Show task
+      .timer  
+      button.btn-light-blue.right.next-task Next task
+    .bar.clearfix
+      .editors
+        .editor#editorHtml
+        .horizontal-divider
+        .editor#editorCss
+      .vertical-divider
+      .results
+        iframe(
+          frameborder="0",
+          class="js-result",
+          sandbox="allow-forms allow-same-origin allow-scripts")
+  #task-dialog.popup
+    include ./includes/taskPopup
 
 block scripts
   script(src='scripts/editor.js')
