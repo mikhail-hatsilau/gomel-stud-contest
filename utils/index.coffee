@@ -27,7 +27,7 @@ getFileStructure = (html, css, script) ->
 
 module.exports.saveFile = (html, css, script, uid, username, taskNumber) ->
   DIR = RESULTS_DIR + uid + '_' + username
-  
+
   mkdirp.sync DIR
   fs.writeFileSync "#{DIR}/task_#{taskNumber}.html", getFileStructure(html, css, script)
 

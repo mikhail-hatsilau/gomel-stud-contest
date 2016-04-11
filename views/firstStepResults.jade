@@ -6,7 +6,7 @@ block title
 block content
   h3 First step results
   .scrollable-table
-    table.mui-table.mui-table--bordered.first-step
+    table.mui-table.mui-table--bordered.first-step-results
       thead
         tr
           th(rowspan=2) Participant
@@ -18,13 +18,11 @@ block content
             //-       button.js-sort Sort
             //-     div Result file
             //- - colNumber++
-          th(data-col= 2 * allTasks.length + 1, rowspan=2) Total
-            button.js-sort Sort
+          th.sort(data-col= 2 * allTasks.length + 1, rowspan=2) Total
         tr
           - var colNumber = 0
           each task in allTasks
-            th(data-col= 2 * colNumber + 1) Time
-              button.js-sort Sort
+            th.sort(data-col= 2 * colNumber + 1) Time
             th Result file
             - colNumber++
 
@@ -32,11 +30,11 @@ block content
         each user in users
           tr(data-id=user.id)
             td #{user.firstName} #{user.lastName}
-            - var totalTime = 0
+            //- - var totalTime = 0
             each task in allTasks
               if user.tasks[task.id]
-                - totalTime += user.tasks[task.id].time
-                td
+                //- - totalTime += user.tasks[task.id].time
+                td.time
                   span.sort-item= user.tasks[task.id].time
                 td
                   a.load-file(href="/saveFile/#{user.id}/#{task.id}") Download
@@ -44,6 +42,5 @@ block content
               else
                 td
                 td
-            td
-              span.sort-item= totalTime
-
+            td.total
+              span.sort-item

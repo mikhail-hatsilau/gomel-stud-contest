@@ -23,18 +23,18 @@ module.exports.getUser = (username) ->
   connection.query QUERY, [username]
 
 module.exports.getUserPromise = (username) ->
-  QUERY = "SELECT #{USERS_TABLE}.id, username, password, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " + 
+  QUERY = "SELECT #{USERS_TABLE}.id, username, password, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " +
   "FROM #{USERS_TABLE} INNER JOIN #{ROLES_TABLE} ON role = #{ROLES_TABLE}.id AND #{USERS_TABLE}.username = ?;"
   co ->
     yield connection.query QUERY, [username]
 
 module.exports.getUserById = (id) ->
-  QUERY = "SELECT #{USERS_TABLE}.id, username, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " + 
+  QUERY = "SELECT #{USERS_TABLE}.id, username, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " +
   "FROM #{USERS_TABLE} INNER JOIN #{ROLES_TABLE} ON role = #{ROLES_TABLE}.id AND #{USERS_TABLE}.id = ?;"
   connection.query QUERY, [id]
 
 module.exports.getUserByIdPromise = (id) ->
-  QUERY = "SELECT #{USERS_TABLE}.id, username, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " + 
+  QUERY = "SELECT #{USERS_TABLE}.id, username, firstName, lastName, active, #{ROLES_TABLE}.id AS roleId, #{ROLES_TABLE}.name AS roleName " +
   "FROM #{USERS_TABLE} INNER JOIN #{ROLES_TABLE} ON role = #{ROLES_TABLE}.id AND #{USERS_TABLE}.id = ?;"
   co ->
     yield connection.query QUERY, [id]
@@ -102,8 +102,8 @@ module.exports.firstStepResults = ->
   connection.query QUERY
 
 module.exports.commonResults = (userId) ->
-  # QUERY = "SELECT #{USERS_TABLE}.id as userId, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, " + 
-  # "#{MARKS_TABLE}.task, #{MARKS_TABLE}.mark " + 
+  # QUERY = "SELECT #{USERS_TABLE}.id as userId, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, " +
+  # "#{MARKS_TABLE}.task, #{MARKS_TABLE}.mark " +
   # "FROM #{USERS_TABLE} LEFT JOIN #{MARKS_TABLE} ON #{USERS_TABLE}.id=#{MARKS_TABLE}.user_id AND #{MARKS_TABLE}.step = ? " +
   # "WHERE #{USERS_TABLE}.role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
   QUERY = "SELECT * FROM #{MARKS_TABLE} WHERE user_id = ?"
@@ -189,6 +189,11 @@ module.exports.getActiveTaskByDisplayNumber = (displayNumber, stepId) ->
 module.exports.getTaskById = (taskId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
   connection.query QUERY, [taskId]
+# 
+# module.exports.getTaskByIdPromise = (taskId) ->
+#   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
+#   co ->
+#     connection.query QUERY, [taskId]
 
 module.exports.updateFirstStepTask = (taskId, name, displayNumber, weight, htmlCode, cssCode, toDo) ->
   QUERY = "UPDATE #{TASKS_TABLE} SET name = ?, displayNumber = ?, weight = ?, htmlCode = ?, cssCode = ?, toDo = ? " +

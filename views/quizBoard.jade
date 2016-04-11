@@ -4,30 +4,14 @@ block title
   title Quiz board
 
 block content
-  .quiz-task-time.mui-textfield
-    input(type="text", value=120, placeholder='Seconds')
-    label Limit time (Seconds)
 
-  .actions
-    button.mui-btn.mui-btn--primary.init-quiz Init
-    button.mui-btn.mui-btn--primary.start-quiz-btn(disabled=true) Start next task
-    button.mui-btn.mui-btn--primary.stop-quiz-task(disabled=true) Finish task
-    //- button.mui-btn.mui-btn--primary.next-quiz-task(disabled=true) Next
-    button.mui-btn.mui-btn--primary.clear-quiz-results Clear results
-
-  .board-task-info
-    .current-task Current task:
-      span
-    .admin-timer Time:
-      span 00:00
-
-  table.mui-table.mui-table--bordered.participants-list(data-count= allTasks.length)
+  table.mui-table.mui-table--bordered.participants-list
     thead
       tr
         th Participant
         //- each task in allTasks
         //-   th= task.name
-        //- th Total time
+        th Total time
     tbody
       //- each user in users
       //-   tr(data-id= user.id)

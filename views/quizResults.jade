@@ -5,8 +5,24 @@ block title
 
 block content
   h3 CSS Quiz results
+  .quiz-task-time.mui-textfield
+    input(type="text", value=120, placeholder='Seconds')
+    label Limit time (Seconds)
+
+  .actions
+    button.mui-btn.mui-btn--primary.init-quiz Init
+    button.mui-btn.mui-btn--primary.start-quiz-btn(disabled=true) Start next task
+    button.mui-btn.mui-btn--primary.stop-quiz-task(disabled=true) Finish task
+    //- button.mui-btn.mui-btn--primary.next-quiz-task(disabled=true) Next
+    button.mui-btn.mui-btn--primary.clear-quiz-results Clear results
+
+  .board-task-info
+    .current-task Current task:
+      span
+    .admin-timer Time:
+      span 00:00 
   .scrollable-table
-    table.mui-table.mui-table--bordered
+    table.mui-table.mui-table--bordered.quiz-results
       thead
         tr
           th(rowspan=2) Participant
@@ -21,34 +37,29 @@ block content
               //-   div(data-col= ++colNumber) Selector
               //-   div(data-col= ++colNumber) Length
               //-     button.js-sort Sort
-          th(data-col= 3 * allTasks.length + 1, rowspan=2) Total
-            button.js-sort Sort
+          th.sort(data-col= 3 * allTasks.length + 1, rowspan=2) Total
         tr
           - var colNumber = 0
           each task in allTasks
-            th(data-col= ++colNumber) Time
-              button.js-sort Sort
-            th(data-col= ++colNumber) Selector
-            th(data-col= ++colNumber) Length
-              button.js-sort Sort
+            th.sort(data-col = ++colNumber) Time
+            th(data-col = ++colNumber) Selector
+            th.sort(data-col = ++colNumber) Length
       tbody
         each user in users
           tr(data-id=user.id)
             td= user.firstName + ' ' + user.lastName
-            - var totalTime = 0
             each task in allTasks
               if user.tasks[task.id]
-                - totalTime += user.tasks[task.id].time
                 //- td
                 //-   span.sort-item= user.tasks[task.id].task.weight
-                td
+                td.time(data-taskid = task.id)
                   span.sort-item= user.tasks[task.id].time
-                td= user.tasks[task.id].selector
-                td
+                td.selector(data-taskid = task.id)= user.tasks[task.id].selector
+                td.selector-length(data-taskid = task.id)
                   span.sort-item= user.tasks[task.id].selector.length
               else
-                td
-                td
-                td
-            td
-              span.sort-item= totalTime
+                td.time(data-taskid= task.id)
+                td.selector(data-taskid= task.id)
+                td.selector-length(data-taskid= task.id)
+            td.total
+              span.sort-item

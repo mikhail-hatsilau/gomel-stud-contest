@@ -58,7 +58,7 @@ body
 
   .container
     line-height: $header-height
-    
+
     a
       text-decoration: none
       color: black
@@ -251,7 +251,7 @@ iframe
 
 div.editor, iframe
   overflow: auto
-  
+
 div.editor
   height: 50%
 
@@ -295,7 +295,7 @@ div.editor:only-child
 
 .editor-name-hint
   position: absolute
-  right: 12px 
+  right: 12px
   top: 12px
   background: rgba(255, 255, 255, 0.5)
   font-family: $font-family-source-sans-pro
@@ -325,6 +325,28 @@ div.editor:only-child
 
 .left
   float: left
+
+.sort
+  position: relative
+  cursor: pointer
+  padding-right: 15px
+
+  &:after
+    content: ""
+    position: absolute
+    top: 0
+    bottom: 0
+    right: 10px
+    margin: auto
+    height: 0
+    width: 0
+    border-top: 5px solid black
+    border-left: 5px solid transparent
+    border-right: 5px solid transparent
+
+.sort.ascending:after
+  border-bottom: 5px solid black
+  border-top: 0
 
 .to-do-block
   position: fixed
@@ -396,7 +418,7 @@ a.edit-btn
   form
     background: $popup-background-color
     padding: 24px
-  
+
     .message, .server-error
       font-size: 16px
       font-family: $font-family-source-sans-pro
@@ -408,7 +430,7 @@ a.edit-btn
     .server-error
       margin: 24px 0
       color: $warning-color
-    
+
     .form-element
       margin: 24px 0
       position: relative
@@ -432,12 +454,12 @@ a.edit-btn
     .username:after, .password:after
       position: absolute
       top: 10px
-      right: 15px 
+      right: 15px
       content: " "
       height: 25px
       width: 25px
       background: url("/images/icons.png")
-    
+
     .username:after
       background-position: -2px
 
@@ -507,7 +529,7 @@ a.edit-btn
 .ui-widget-content, .ui-dialog-titlebar
   color: black
 
-.ui-dialog 
+.ui-dialog
   .ui-dialog-titlebar-close
     display: none
 
@@ -568,40 +590,36 @@ a.edit-btn
         border: 1px solid $mui-divider-color
 
       th
-        width: 500px
-        padding: 0 10px
         text-align: center
 
         &:last-child
           border-right: none
-          width: 200px
+          width: 100px
 
         &:first-child
-          width: 300px
-
-        &:not(:first-child):not(:last-child)
-          padding: 0
+          width: 270px
 
       td
+        // overflow: hidden
+        // text-overflow: ellipsis
+        // white-space: nowrap
+        word-break: break-all
         &:last-child
           border-right: none
 
-  .first-step
-    tr
-      th
-        >div
-          div
-            width: 50%
-
   .total-results
-    tr
-      th
-        width: 150px
+    td
+      input
+        display: inline-block
+        width: 100%
 
-      td
-        input
-          display: inline-block
-          width: 100%
+  .first-step-results
+    th
+      width: 300px
+
+  .quiz-results
+    th
+      width: 450px
 
 .load-file
   margin-right: 10px

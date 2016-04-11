@@ -99,6 +99,7 @@ io.on 'connection', (socket) ->
       .then (resp) ->
         # db.clearQuizResults()
         tasks = getTasks resp[0]
+        io.to('admin room').emit 'init board'
         io.to('students room').emit 'init'
         callback tasks
 
@@ -116,8 +117,8 @@ io.on 'connection', (socket) ->
   # socket.on 'begin', (time, callback) ->
   #   # io.to 'ready room'
   #   #   .emit 'start quiz', time * 60
-   
-        
+
+
   #       callback tasks
   #   io.to('ready room').emit 'next', {
   #     time: time,
@@ -130,7 +131,13 @@ io.on 'connection', (socket) ->
     io.to 'ready room'
       .emit 'next', {
         time: data.timeLimit,
-        taskId: data.taskId
+        taskId: data.task.id
+      }
+
+    io.to 'admin room'
+      .emit 'next task board', {
+        task: data.task,
+        timeLimit: data.timeLimit
       }
 
     callback()
@@ -163,5 +170,5 @@ app.use (next) ->
     errorStatus: 404,
     errorMessage: 'The page not found'
   }
-  
+
 httpServer.listen config.get('port')

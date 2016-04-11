@@ -4,48 +4,48 @@ block title
   title Total results
 
 block content
-  .scrollable-table
-    table.mui-table.mui-table--bordered.total-results
-      thead
-        th Participant
-        -var colNumber = 0
-        each task in tasks.step1
-          th(data-col= ++colNumber) Step1.#{task.name}
-            button.js-sort Sort
-        th(data-col= ++colNumber) Step1
-          button.js-sort Sort
-        each task in tasks.step2
-          th(data-col= ++colNumber) Step2.#{task.name}
-            button.js-sort Sort
-        th(data-col= ++colNumber) Step2
-          button.js-sort Sort
-        th(data-col= ++colNumber) Total
-          button.js-sort Sort
-      tbody
-        each user in users
-          tr(data-id=user.id)
-            td #{user.firstName} #{user.lastName}
-            -var totalMarkStep1 = 0
+  .container
+    .scrollable-table
+      table.mui-table.mui-table--bordered.total-results
+        thead
+          tr
+            th(rowspan=2) Participant
+            th(colspan=tasks.step1.length + 1, style="width: #{150 * (tasks.step1.length + 1)}px;") Step 1
+            th(colspan=tasks.step2.length + 1, style="width: #{150 * (tasks.step2.length + 1)}px;") Step 2
+            th(rowspan=2, data-col=tasks.step1.length + tasks.step2.length + 3) Total
+          tr
+            -var colNumber = 0
             each task in tasks.step1
-              if user.tasksMarks[task.id]
-                -totalMarkStep1 += user.tasksMarks[task.id]
-                td.step1-task.js-mark(data-taskid=task.id)
-                  span.sort-item= user.tasksMarks[task.id]
-              else
-                td.step1-task.js-mark(data-taskid=task.id)
-                  span.sort-item 0
-            td.step1-sum
-              span.sort-item= totalMarkStep1
-            -var totalMarkStep2 = 0
+              th.sort(data-col= ++colNumber) #{task.name}
+            th.sort(data-col= ++colNumber) Total
             each task in tasks.step2
-              if user.tasksMarks[task.id]
-                -totalMarkStep2 += user.tasksMarks[task.id]
-                td.step2-task.js-mark(data-taskid=task.id)
-                  span.sort-item= user.tasksMarks[task.id]
-              else
-                td.step2-task.js-mark(data-taskid=task.id)
-                  span.sort-item 0
-            td.step2-sum
-              span.sort-item= totalMarkStep2
-            td.total-mark
-             span.sort-item= totalMarkStep1 + totalMarkStep2
+              th.sort(data-col= ++colNumber) #{task.name}
+            th.sort(data-col= ++colNumber) Total
+        tbody
+          each user in users
+            tr(data-id=user.id)
+              td #{user.firstName} #{user.lastName}
+              -var totalMarkStep1 = 0
+              each task in tasks.step1
+                if user.tasksMarks[task.id]
+                  -totalMarkStep1 += user.tasksMarks[task.id]
+                  td.step1-task.js-mark(data-taskid=task.id)
+                    span.sort-item= user.tasksMarks[task.id]
+                else
+                  td.step1-task.js-mark(data-taskid=task.id)
+                    span.sort-item 0
+              td.step1-sum
+                span.sort-item= totalMarkStep1
+              -var totalMarkStep2 = 0
+              each task in tasks.step2
+                if user.tasksMarks[task.id]
+                  -totalMarkStep2 += user.tasksMarks[task.id]
+                  td.step2-task.js-mark(data-taskid=task.id)
+                    span.sort-item= user.tasksMarks[task.id]
+                else
+                  td.step2-task.js-mark(data-taskid=task.id)
+                    span.sort-item 0
+              td.step2-sum
+                span.sort-item= totalMarkStep2
+              td.total-mark
+               span.sort-item= totalMarkStep1 + totalMarkStep2

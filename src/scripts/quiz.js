@@ -26,7 +26,7 @@ $(function (){
 		var tags = str.split(/&lt;/g);
 		var attrs = str.split("=");
 		var values = str.split("\"");
-		
+
 		//tagNames
 		if (tags.length > 0) {
 			(function (){
@@ -125,7 +125,7 @@ $(function (){
 		$.get("/quizTasks/" + taskId, function (data) {
 			showHtmlBlock();
 			// setTimeout(function (){
-				
+
 			// }, 500);
 			startTime = new Date();
 			savedTime = localStorage.getItem('quizTime') || undefined
@@ -224,6 +224,7 @@ $(function (){
 		socketIo.emit('pass test', {
 			taskId: taskId,
 			time: time,
+			timeLimit: timeLimit,
 			selector: selector,
 			passed: passed
 		});
