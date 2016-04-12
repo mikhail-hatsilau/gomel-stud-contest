@@ -454,6 +454,8 @@ $(->
         $('.quiz-results')
           .find 'tbody'
           .empty()
+        $('.start-quiz-btn').prop 'disabled', true
+        $('.stop-quiz-task').prop 'disabled', true
       .fail ->
         console.log 'Error ocured'
         statusPopup.showErrorPopup 'Results were not cleared'
