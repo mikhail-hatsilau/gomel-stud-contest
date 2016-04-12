@@ -1,15 +1,19 @@
-form.edit-user(action="/editUser", method="POST")
-  div.mui-textfield
-    input.edit-username(type="text", name="username", required)
-    label Username
-  div.mui-textfield
-    input.edit-firstname(type="text", name="firstName", required)
-    label First name
-  div.mui-textfield
+form.edit-user-form(action="/editUser", method="POST")
+  div.textfield
+    .label
+      label(for="edit-popup-username") Username
+    input#edit-popup-username.edit-username(type="text", name="username", required)
+  div.textfield
+    .label
+      label(for="edit-popup-firstname") First name
+    input#edit-popup-firstname.edit-firstname(type="text", name="firstName", required)
+  div.textfield
+    .label
+      label(for="edit-popup-lastname") Last name
     input.edit-lastname(type="text", name="lastName", required)
-    label Last name
-  div.mui-select
-    select.roles(name="role")
+  div.selectfield
+    .label
+      label(for="edit-popup-roles") Roles
+    select#edit-popup-roles.roles(name="role")
   input.user-id(type="hidden", name="userId")
   input.edit-active(type="hidden", name="active")
-

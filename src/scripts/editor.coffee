@@ -75,7 +75,6 @@ editorCss.on 'change', _.debounce(savePage, 2000)
 
 # Fills editors and popup with new task information
 showTask = (task) ->
-  console.log task
   htmlCode = getLocalStorage('htmlCode') || task.htmlCode
   cssCode = getLocalStorage('cssCode') || task.cssCode
   editorHtml.setValue htmlCode, -1
@@ -134,6 +133,7 @@ saveTaskResults = () ->
       loadTask()
     .error ->
       console.log 'Error while saving task results'
+      clearLocalStorageItem 'firstStepStartTime'
 
 # startQuiz = ->
 #   clearLocalStorageItem 'taskNumber'

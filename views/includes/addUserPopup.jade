@@ -1,15 +1,21 @@
 form.add-user(action="/addUser", method="POST")
-  div.mui-textfield.mui-textfield--float-label
-    input.add-username(type="text", name="username", required)
-    label Username
-  div.mui-textfield.mui-textfield--float-label
-    input.add-password(type="password", name="password", required)
-    label Password
-  div.mui-textfield.mui-textfield--float-label
-    input.add-firstname(type="text", name="firstName", required)
-    label First name
-  div.mui-textfield.mui-textfield--float-label
-    input.add-lastname(type="text", name="lastName", required)
-    label Last name
-  div.mui-select
-    select.roles(name="role")
+  .textfield
+    .label
+      label(for="username") Username
+    input#username.add-username(type="text", name="username", required)
+  .textfield
+    .label
+      label(for="password") Password
+    input#password.add-password(type="password", name="password", required)
+  .textfield
+    .label
+      label(for="first-name") First name
+    input#first-name.add-firstname(type="text", name="firstName", required)
+  .textfield
+    .label
+      label(for="last-name") Last name
+    input#last-name.add-lastname(type="text", name="lastName", required)
+  .selectfield
+    .label
+      label(for="role") Role
+    select#role.roles(name="role")

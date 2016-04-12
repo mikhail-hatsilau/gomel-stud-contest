@@ -18,6 +18,8 @@ $roboto-font-family: 'Roboto', helvetica, sans-serif, arial
 $dark-green-color: #7F993A
 $lime-green-color: #A3C644
 $popup-background-color: #E6E6E5
+$gray-color: #999
+$medium-gray-color: #666666
 $background-color: #E4E4E4
 $border-color: #CCC
 $editors-border-color: #C3D2D4
@@ -27,6 +29,7 @@ $light-blue-color: #1A9CB0
 $dark-blue-color: #063C44
 $task-color: #576061
 $placeholder-color: #AFAFAF
+$heading-color: #444C4D
 
 html, body
   margin: 0
@@ -165,6 +168,13 @@ ul
   text-transform: uppercase
   cursor: pointer
 
+a.btn
+  text-decoration: none
+
+  &:hover, &:active, &:focus
+    color: white
+    text-decoration: none
+
 .btn-dark-green
   @extend .btn
   color: white
@@ -189,6 +199,17 @@ ul
   &:hover
     background: #137B8B
 
+// .btn-lime-green
+//   @extend .btn
+//   color: white
+//   background: $lime-green-color
+//
+//   &:hover
+//     background: #A3C644
+
+.content
+  padding-bottom: 24px
+
 .content.editor-page
   position: absolute
   top: $header-height
@@ -198,6 +219,14 @@ ul
 
   .container
     height: 100%
+
+.error-section
+  background: white
+  border: 1px solid $editors-border-color
+  padding: 12px
+  margin-top: 24px
+  font-size: 16px
+  font-family: $font-family-source-sans-pro
 
 .timer
   display: inline-block
@@ -263,6 +292,9 @@ div.editor:only-child
   height: 100%
   border: none
 
+.editor.ace_editor
+  font-size: 14px
+
 .horizontal-divider
   position: absolute
   top: 50%
@@ -303,13 +335,16 @@ div.editor:only-child
   color: #ADBFC2
   line-height: 1em
 
-#editorHtml:after
+#editorHtml:after, #htmlEditor:after
   content: "HTML"
   @extend .editor-name-hint
 
-#editorCss:after
+#editorCss:after, #cssEditor:after
   content: "CSS"
   @extend .editor-name-hint
+
+#htmlEditor:only-child
+  border: 1px solid $editors-border-color
 
 .results
   position: relative
@@ -357,18 +392,6 @@ div.editor:only-child
   color: white
   padding: 20px
 
-.round-btn
-  background-color: black
-  color: white
-  box-shadow: 0 1px 8px black
-  border: none
-  width: 50px
-  height: 50px
-  line-height: 50px
-  text-align: center
-  border-radius: 50%
-  cursor: pointer
-
 .remove-btn, .edit-btn
   background: transparent
   border: none
@@ -376,15 +399,43 @@ div.editor:only-child
 a.edit-btn
   color: black
 
+.head-controls
+  h1
+    display: inline-block
+    vertical-align: middle
+    width: 50%
+
+  .button-set
+    display: inline-block
+    text-align: right
+    vertical-align: middle
+    width: 50%
+
 //***Quiz board****
+h1
+  font-family: $font-family-oswald
+  font-size: 21px
+  color: $heading-color
+  margin: 18px 0 18px
+  text-transform: uppercase
+
+  button
+    float: right
+
 .participants-list
   width: 100%
+  background: white
+  border: 1px solid $editors-border-color
+  font-family: $font-family-source-sans-pro
+  font-size: 14px
+  color: #576061
 
   tr
     transition: background-color 1s
+    border-bottom: 1px solid $editors-border-color
 
-.selector-length
-  margin-left: 10px
+    td, th
+      padding: 19px 12px 18px
 
 .board-task-info
   >div
@@ -464,7 +515,7 @@ a.edit-btn
       background-position: -2px
 
     .password:after
-      background-position: 25px
+      background-position: -44px
 
 .login-popup-title
   text-align: center
@@ -502,6 +553,7 @@ a.edit-btn
     padding: 24px
     border-bottom: 1px solid $editors-border-color
     font-size: 18.7px
+    background: white
     color: $task-color
     font-weight: 300
 
@@ -526,24 +578,77 @@ a.edit-btn
   border-radius: 0
   padding: 0
 
-.ui-widget-content, .ui-dialog-titlebar
-  color: black
+.ui-widget-content
+  color: #444C4D
+  font-family: $font-family-source-sans-pro
 
 .ui-dialog
   .ui-dialog-titlebar-close
     display: none
 
 .ui-dialog
+  .ui-dialog-titlebar
+    background-color: $gray-color
+    padding: 15px
+    font-family: $font-family-oswald
+    color: white
+    text-transform: uppercase
+    font-weight: normal
+
   .ui-dialog-content
     overflow: visible
+    padding: 15px
+
+  .ui-dialog-buttonpane
+    padding: 15px
 
   .ui-dialog-buttonset
     button
-      background: none
-      color: $mui-primary-color
+      color: white
       border-radius: 0
       border: none
       text-transform: uppercase
+      font-family: $font-family-oswald
+      padding: 5px 12px
+      margin: 0
+
+      &:first-child
+        background: $dark-green-color
+
+        &:hover
+          background: $lime-green-color
+
+      &:last-child
+        background: $gray-color
+        margin-left: 10px
+
+        &:hover
+          background: $medium-gray-color
+
+.textfield
+  margin: 24px 0
+
+  &:first-child
+    margin-top: 0
+
+  .label
+    margin-bottom: 5px
+
+  input, textarea
+    width: 100%
+    border-radius: 0
+    border: 1px solid $editors-border-color
+    padding: 11px 12px
+
+  textarea
+    resize: vertical
+
+.selectfield
+  .label
+    margin-bottom: 5px
+  select
+    width: 100%
+    padding: 12px
 
 .popup-actions
   text-align: right
@@ -574,20 +679,136 @@ a.edit-btn
     bottom: 0
     left: 0
     right: 0
+
+.task-edit-form
+  .common-info
+    background: white
+    border: 1px solid $editors-border-color
+    margin-bottom: 24px
+    padding: 12px
 // end edit tasks page
 
-.mui-table
-  table-layout: fixed
-
 // Quiz results page
+.quiz-operations
+  border: 1px solid $editors-border-color
+  background: white
+  margin-bottom: 24px
+  font-family: $font-family-source-sans-pro
+
+  >div
+    padding: 0 12px
+
+  .actions
+    border-bottom: 1px solid $editors-border-color
+
+div.quiz-task-time
+  padding-top: 12px
+  padding-bottom: 12px
+  font-size: 16px
+  color: #576061
+
+  >div
+    display: inline-block
+    margin-left: 24px
+
+    span
+      margin-left: 5px
+
+  label
+    margin-right: 12px
+  input
+    padding: 5px
+    width: 50px
+    text-align: center
+    border: 1px solid $editors-border-color
+
+  input+span
+    margin-left: 12px
+
+.quiz-btn
+  border: none
+  background: transparent
+  font-weight: bold
+  font-size: 16px
+  font-family: $font-family-source-sans-pro
+  color: #576061
+  padding: 12px
+
+  &:not([disabled]):hover
+    color: #009DAD
+    .ico-init
+      background-position: 202px 0
+
+    .ico-start
+      background-position: 163px 0
+
+    .ico-finish
+      background-position: 128px 0
+
+    .ico-clear
+      background-position: 84px 0
+
+.ico
+  background: url("/images/icons.png")
+  margin-right: 12px
+  display: inline-block
+  vertical-align: middle
+  width: 30px
+  height: 30px
+
+.ico-init
+  background-position: -86px 0
+
+.ico-start
+  background-position: -125px 0
+
+.ico-finish
+  background-position: -160px 0
+
+.ico-clear
+  background-position: -204px 0
+
+table.bordered
+  tr
+    th, td
+      border: 1px solid $mui-divider-color
+
+table
+  table-layout: fixed
+  width: 100%
+  border: 1px solid $editors-border-color
+  background: white
+
+  th, td
+    padding: 12px
+  thead
+    tr:last-child
+      border-bottom: 1px solid $editors-border-color
+
 .scrollable-table
-  border-right: 1px solid $mui-divider-color
+  border: 1px solid $editors-border-color
+  background: white
   overflow-x: auto
   overflow-y: visible
-  .mui-table
+  table
+    table-layout: fixed
+    width: 100%
+    border: none
+    thead
+      tr:first-child
+        th
+          border-top: none
+
+    th:first-child, td:first-child
+      border-left: none
+
+    tr:last-child
+      border-bottom: 0
+
     tr
       th, td
         border: 1px solid $mui-divider-color
+        padding: 12px
 
       th
         text-align: center
@@ -631,6 +852,7 @@ a.edit-btn
   right: 100px
   padding: 20px
   display: none
+  border: 1px solid $editors-border-color
 
   >div
     display: inline-block
@@ -674,6 +896,7 @@ a.edit-btn
   color: #576061
   font-family: "Lucida Console", monospace
   font-size: 16px
+  table-layout: auto
 
   tr
     background: white
@@ -792,3 +1015,19 @@ a.edit-btn
 
 .quiz-task-info
   margin: 16px 0 18px
+
+.user-task-info
+  height: 90px
+  line-height: 90px
+  >div
+    display: inline-block
+    color: $heading-color
+    font-family: $font-family-source-sans-pro
+    font-size: 18px
+    margin-left: 24px
+
+    &:first-child
+      margin-left: 0
+
+    span
+      margin-left: 10px

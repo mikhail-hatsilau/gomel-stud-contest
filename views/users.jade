@@ -4,34 +4,38 @@ block title
   title Users
 
 block content
-  button.mui-btn.mui-btn--primary.add-new-user.js-show-popup Add
-  table.mui-table.mui-table--bordered.users-list      
-    thead
-      tr
-        th Username
-        th Firstname
-        th LastName
-        th Role
-        th Active
-        th
-    tbody
-      each user in users
-        tr(data-id="#{user.id}")
-          td.username= user.username
-          td.firstname= user.firstName
-          td.lastname= user.lastName
-          td.roles(data-roleid=user.role.id)= user.role.name
-          td
-            input.ativate-user(type="checkbox", name="active", checked=!!user.active, autocomplete="off")
-          td
-            button.edit-btn.edit-user
-              i.fa.fa-pencil-square-o
-            button.remove-btn.remove-user
-              i.fa.fa-trash
+  .container
+    .head-controls
+      h1 Users
+      .button-set
+        button.btn.btn-dark-green.add-new-user Add
+    table.users-list      
+      thead
+        tr
+          th Username
+          th Firstname
+          th LastName
+          th Role
+          th Active
+          th
+      tbody
+        each user in users
+          tr(data-id="#{user.id}")
+            td.username= user.username
+            td.firstname= user.firstName
+            td.lastname= user.lastName
+            td.roles(data-roleid=user.role.id)= user.role.name
+            td
+              input.ativate-user(type="checkbox", name="active", checked=!!user.active, autocomplete="off")
+            td
+              button.edit-btn.edit-user
+                i.fa.fa-pencil-square-o
+              button.remove-btn.remove-user
+                i.fa.fa-trash
 
   #addUserPopup
-    include ./includes/addUserPopup.jade
+    include ./includes/addUserPopup
   #removeConfirmationDialog
-    include ./includes/removeConfirmationPopup.jade
+    include ./includes/removeConfirmationPopup
   #editUserPopup
-    include ./includes/editUserPopup.jade
+    include ./includes/editUserPopup

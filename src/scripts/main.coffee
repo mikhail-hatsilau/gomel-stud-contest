@@ -68,17 +68,9 @@ $(->
     if $('.first-step-results').length
       rows = $('.first-step-results').find('tbody').find 'tr'
       filterTimeValues rows
-    # for row in rows
-    #   total = 0
-    #   timeColumns = $(row).find 'td.time'
-    #   for column in timeColumns
-    #     elementWithTime = $(column).find('.sort-item')
-    #     total += +elementWithTime.text()
-    #     elementWithTime.text parseTime(elementWithTime.text())
-    #   $(row)
-    #     .find '.total'
-    #     .find '.sort-item'
-    #     .text parseTime total
+    if $('.time-spent-markup').length
+      timeElement = $('.time-spent-markup').find 'span'
+      timeElement.text parseTime(parseInt(timeElement.text()))
   )()
 
   $('.sign-in').on 'submit', (event) ->
@@ -238,6 +230,7 @@ $(->
         console.log "Error occured"
 
   fillEditUserPopup = (dialog) ->
+    console.log 'load'
     rolesLoadedCallback = =>
       userId = $(this).parents('tr').data 'id'
 
@@ -289,6 +282,7 @@ $(->
 
     # Open add user popup
     $('.edit-user').on 'click', (event) ->
+      console.log 'edit-btn'
       fillEditUserPopup.call this, dialog
       dialog.dialog 'open'
 
@@ -455,7 +449,6 @@ $(->
   $('.clear-quiz-results').on 'click', ->
     $.post '/clearQuiz'
       .done (resp) ->
-        console.log resp.message
         statusPopup.showSuccessPopup resp.message
         localStorage.removeItem 'currentQuizTask'
         $('.quiz-results')
@@ -692,8 +685,8 @@ $(->
     # columns = participant.find('td').toArray()
     # task = participant.find "td[data-taskid= #{data.results.taskId}]"
     # task.empty()
-    time = $('<span class="time"/>')
-    selectorLength = $('<span class="selector-length"/>')
+    time = $('<div class="time"/>')
+    selectorLength = $('<div class="selector-length"/>')
 
     if not data.results.passed
       time.text '--'

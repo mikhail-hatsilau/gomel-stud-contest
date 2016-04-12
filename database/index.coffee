@@ -130,7 +130,7 @@ module.exports.saveFirstStepResults = (userId, taskId, time, htmlCode, cssCode, 
   connection.query QUERY, [userId, taskId, time, htmlCode, cssCode, path]
 
 module.exports.getFirstStepTaskResults = (userId, taskNumber) ->
-  QUERY = "SELECT user_id, task, htmlCode, cssCode, path FROM #{FIRST_STEP_TABLE} " +
+  QUERY = "SELECT * FROM #{FIRST_STEP_TABLE} " +
   "WHERE user_id = ? AND task = ?;"
   connection.query QUERY, [userId, taskNumber]
 
@@ -189,7 +189,7 @@ module.exports.getActiveTaskByDisplayNumber = (displayNumber, stepId) ->
 module.exports.getTaskById = (taskId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
   connection.query QUERY, [taskId]
-# 
+#
 # module.exports.getTaskByIdPromise = (taskId) ->
 #   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
 #   co ->

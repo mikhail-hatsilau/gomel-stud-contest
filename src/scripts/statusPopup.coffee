@@ -1,7 +1,7 @@
 $ = require 'jquery'
 
 module.exports = ->
-  popup = $('<div class="status-popup mui--z4" />')
+  popup = $('<div class="status-popup" />')
   iconElement = $('<div class="icon"/>')
   messageElement = $('<div class="message"/>')
   popup
@@ -21,12 +21,12 @@ module.exports = ->
       iconElement
         .empty()
         .append $('<i class="fa fa-check"/>')
-      showPopup message 
+      showPopup message
     ,
     showErrorPopup: (message) ->
       iconElement
         .empty()
         .append $('<i class="fa fa-remove"/>')
       messageElement.text message
-      showPopup message 
+      showPopup message
   }

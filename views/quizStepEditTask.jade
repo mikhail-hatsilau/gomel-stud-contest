@@ -4,27 +4,34 @@ block title
   title Edit step 2 task
 
 block content
-  form.quiz-task-edit-form(action="/saveQuizStepTask/#{task.id ? task.id : ''}")
-    .actions-section
-      button.mui-btn.mui-btn--primary(type="submit") Save
-    .task-info.clearfix
+  .container
+    form.quiz-task-edit-form.task-edit-form(action="/saveQuizStepTask/#{task.id ? task.id : ''}", method="POST")
+      .head-controls
+        h1= task.name || "New Task"
+        .button-set
+          button.btn.btn-dark-green(type="submit") Save
       .common-info
-        .mui-textfield
-          input(type="text", name="name", value=task.name ? task.name : '', required)
-          label Name of task
-        .mui-textfield
-          input(type="text", name="displayNumber", value=task.displayNumber ? task.displayNumber : '', required)
-          label Display number
-        .mui-textfield
-          input(type="text", name="weight", value=task.weight ? task.weight : '', required)
-          label Weight of task
-        .mui-textfield
-          input(type="text", name="answares", value=task.answares ? task.answares : '', required)
-          label Answare row
-        .mui-textfield
-          input(type="text", name="deprecatedSelectors", value=task.deprecatedSelectors ? task.deprecatedSelectors : '')
-          label Deprecated selectors
-      .code-editor
-        .editor#htmlEditor= task.htmlCode
+        .textfield
+          .label
+            label(for="task-name") Name of task
+          input#task-name(type="text", name="name", value=task.name ? task.name : '', required)
+        .textfield
+          .label
+            label(for="display-number") Display number
+          input#display-number(type="text", name="displayNumber", value=task.displayNumber ? task.displayNumber : '', required)
+        .textfield
+          .label
+            label(for="weight") Weight of task
+          input#weight(type="text", name="weight", value=task.weight ? task.weight : '', required)
+        .textfield
+          .label
+            label(for="answares") Answare rows
+          input#answares(type="text", name="answares", value=task.answares ? task.answares : '', required)
+        .textfield
+          .label
+            label(for="deprecated-selectors") Deprecated selectors
+          input#deprecated-selectors(type="text", name="deprecatedSelectors", value=task.deprecatedSelectors ? task.deprecatedSelectors : '')
+    .code-editor
+      .editor#htmlEditor= task.htmlCode
 block scripts
   script(src='/scripts/adminEditor.js')

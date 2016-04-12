@@ -3,6 +3,7 @@ utils = require '../utils'
 _ = require 'lodash'
 User = require '../models/user'
 FirstStepTask = require '../models/firstStepTask'
+Role = require '../models/role'
 
 module.exports.results = (next) ->
   FIRST_STEP_ID = 1
@@ -17,7 +18,7 @@ module.exports.results = (next) ->
       resp = yield db.getUserById row.user_id
       usersRows = resp[0]
 
-      role = 
+      role =
         id: usersRows[0].roleId
         name: usersRows[0].roleName
 
@@ -31,7 +32,7 @@ module.exports.results = (next) ->
       )
       user.tasks = {}
       users.push user
-    else 
+    else
       user = users[index]
 
     resp = yield db.getTask row.task
@@ -76,9 +77,39 @@ module.exports.showMarkup = (next) ->
   taskNumber = this.params.taskNumber
 
   resp = yield db.getFirstStepTaskResults userId, taskNumber
-  rows = resp[0]
+  result = resp[0][0]
+
+  resp = yield db.getUserById userId
+  userRow = resp[0][0]
+
+  resp = yield db.getTask result.task
+  taskRow = resp[0][0]
+  task = new FirstStepTask(
+    taskRow.id,
+    taskRow.name,
+    taskRow.displayNumber,
+    taskRow.weight,
+    taskRow.htmlCode,
+    taskRow.cssCode,
+    taskRow.toDo,
+    taskRow.active
+  )
+
+  role = new Role userRow.rolId, userRow.roleName
+  user = new User(
+    userRow.id,
+    userRow.username,
+    userRow.firstName,
+    userRow.lastName,
+    userRow.active,
+    role
+  )
+
+  console.log user
 
   yield this.render 'resultsMarkup', {
-    editorPage: true,
-    taskInfo: rows[0]
+    task: task,
+    userInfo: user,
+    result: result,
+    contentClass: 'editor-page'
   }

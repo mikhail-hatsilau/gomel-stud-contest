@@ -4,18 +4,19 @@ block title
   title Quiz board
 
 block content
-
-  table.mui-table.mui-table--bordered.participants-list
-    thead
-      tr
-        th Participant
-        //- each task in allTasks
-        //-   th= task.name
-        th Total time
-    tbody
-      //- each user in users
-      //-   tr(data-id= user.id)
-      //-     td= user.firstName + ' ' + user.lastName
-      //-     each task in allTasks
-      //-       td(data-taskid=task.id)
-      //-     td.total
+  .container
+    h1 CSS Quiz Board
+    table.participants-list
+      thead
+        tr
+          th Participant
+          //- each task in allTasks
+          //-   th= task.name
+          th Total time
+      tbody
+        //- each user in users
+        //-   tr(data-id= user.id)
+        //-     td= user.firstName + ' ' + user.lastName
+        //-     each task in allTasks
+        //-       td(data-taskid=task.id)
+        //-     td.total

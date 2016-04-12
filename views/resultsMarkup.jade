@@ -4,19 +4,28 @@ block title
   title Results markup
 
 block content
-  .bar.clearfix
-    .editors
-      .editor#htmlEditor
-        | #{taskInfo.htmlCode}
-      .horizontal-divider
-      .editor#cssEditor
-        | #{taskInfo.cssCode}
-    .vertical-divider
-    .results
-      iframe(
-        frameborder="0",
-        sandbox="allow-forms allow-same-origin allow-scripts"
-        src="#{taskInfo.path}"
-      )
+  .container
+    .user-task-info
+      .name-of-user
+        |User:
+        span= userInfo.firstName + ' ' + userInfo.lastName
+      .task-name
+        |Task:
+        span= task.name
+      .time-spent-markup
+        |Time spent:
+        span= result.time
+    .bar.clearfix
+      .editors
+        .editor#htmlEditor= result.htmlCode
+        .horizontal-divider
+        .editor#cssEditor= result.cssCode
+      .vertical-divider
+      .results
+        iframe(
+          frameborder="0",
+          sandbox="allow-forms allow-same-origin allow-scripts"
+          src="#{result.path}"
+        )
 block scripts
   script(src='/scripts/adminEditor.js')

@@ -4,36 +4,40 @@ block title
   title Quiz tasks
 
 block content
-  a.mui-btn.mui-btn--primary.add-new-task(href="/addQuizStepTask") Add
-  table.mui-table.mui-table--bordered.tasks-list
-    thead
-      tr
-        th Id
-        th Name
-        th.sort(data-col=2) Display number
-        th.sort(data-col=3) Weight
-        th Answare
-        th Deprecated selectors
-        th Active
-        th
-    tbody
-      each task in tasks
-        tr(data-id=task.id)
-          td= task.id
-          td= task.name
-          td
-            span.sort-item= task.displayNumber
-          td
-            span.sort-item= task.weight
-          td= task.answares
-          td= task.deprecatedSelectors
-          td
-            input.active-task(type="checkbox", name="active", value=task.active, autocomplete="off", checked=task.active ? true : false)
-          td
-            a.edit-btn(href="/editQuizStepTask/#{task.id}")
-              i.fa.fa-pencil-square-o
-            button.remove-btn.remove-task
-              i.fa.fa-trash
+  .container
+    .head-controls
+      h1 Quiz Tasks
+      .button-set
+        a.btn.btn-dark-green.add-new-task(href="/addQuizStepTask") Add
+    table.tasks-list
+      thead
+        tr
+          th Id
+          th Name
+          th.sort(data-col=2) Display number
+          th.sort(data-col=3) Weight
+          th Answare
+          th Deprecated selectors
+          th Active
+          th
+      tbody
+        each task in tasks
+          tr(data-id=task.id)
+            td= task.id
+            td= task.name
+            td
+              span.sort-item= task.displayNumber
+            td
+              span.sort-item= task.weight
+            td= task.answares
+            td= task.deprecatedSelectors
+            td
+              input.active-task(type="checkbox", name="active", value=task.active, autocomplete="off", checked=task.active ? true : false)
+            td
+              a.edit-btn(href="/editQuizStepTask/#{task.id}")
+                i.fa.fa-pencil-square-o
+              button.remove-btn.remove-task
+                i.fa.fa-trash
 
   #removeConfirmationDialog
     include ./includes/removeConfirmationPopup.jade
