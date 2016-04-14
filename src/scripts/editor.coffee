@@ -162,7 +162,7 @@ submitFrameForm = (action) ->
       body = $(that).parent 'body'
       contentBlock = $('<div class="frame-info"/>')
       timerElement = $('<div class="timer"/>')
-      contentBlock.append $('<div class="message"/>').text(resp.message)
+      contentBlock.append $('<div class="message" style="font-family: Helvetica, Arial;"/>').text(resp.message)
       contentBlock.append timerElement
       body.empty()
       body.append contentBlock
@@ -180,7 +180,7 @@ submitFrameForm = (action) ->
       $(that).find('.error').remove()
       for error in xhr.responseJSON
         for own key, value of error
-          errorDiv = $('<div>').addClass 'error'
+          errorDiv = $('<div style="font-family: Helvetica, Arial;"/>').addClass 'error'
           $(that).append errorDiv.text value
 
 loadTask()

@@ -123,10 +123,10 @@ $(function (){
 		// }
 
 		$.get("/quizTasks/" + taskId, function (data) {
-			showHtmlBlock();
-			// setTimeout(function (){
+			// showHtmlBlock();
+			var START_TAG_REGEXP = /\<[a-zA-Z]+/g;
+			var matchResult;
 
-			// }, 500);
 			startTime = new Date();
 			savedTime = localStorage.getItem('quizTime') || undefined
 			if(savedTime) {
@@ -152,21 +152,37 @@ $(function (){
 			} else {
 				forbidden = data.deprecatedSelectors.split(' ');
 			}
-			console.log(forbidden.join('&nbsp'));
 			$('.forbidden .data').html(forbidden.join('&nbsp&nbsp&nbsp'));
-			rootNode = $("<div/>");
-			rootNode.append(data.htmlCode);
-			$(rootNode).find('*').each(function (index){
-				$(this).attr('data-csstest-row', index);
-			});
 
+			var linesWithRowNumber = []
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i]
+				if (START_TAG_REGEXP.test(line)){
+					matchResult = line.match(START_TAG_REGEXP);
+					matchResult.forEach(function(element){
+						var index = line.indexOf(element);
+						var firstSubString = line.slice(0, index + element.length)
+						var secondSubString = line.slice(firstSubString.length, line.length)
+						line = firstSubString + ' data-csstest-row="' + i + '" ' + secondSubString
+					});
+				}
+				linesWithRowNumber.push(line);
+			}
+			rootNode = $("<div/>");
+			rootNode.append(linesWithRowNumber.join('\n'));
+			// $(rootNode).find('*').each(function (index){
+			// 	console.log(index);
+			// 	$(this).attr('data-csstest-row', index);
+			// });
 			for (var i = 0; i < lines.length; i++) {
 				var source = $("<div/>").text(lines[i]).html();
 				var html = "<tr><td class='line-num'>" + (i+1) + "</td><td><div class='flag'></div></td><td class='code'>" + formatHtml(source.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")) + "</td></tr>";
+				var codeElement = $(html)
 				if (needed.indexOf(i) >= 0) {
-					html = $("<div/>").append($(html).addClass('needed')).html();
+					// html = $("<div/>").append($(html).addClass('needed')).html();
+					codeElement.addClass('needed')
 				}
-				$('.html-code').append(html);
+				$('.html-code').append(codeElement);
 			}
 		}).fail(function (){
 			//finish();
@@ -208,7 +224,6 @@ $(function (){
 			}
 			if (needed.length == $('.selected').length && forbiddenFlag) {
 				time = (new Date() - startTime)/1000;
-				console.log(time);
 				clearInterval(intervalId);
 				emitEvent(taskId, time, selector, true);
 				return true;

@@ -7,43 +7,47 @@ block content
   .container
     h1 First step results
     .scrollable-table
-      div
-        table.first-step-results
-          thead
-            tr
-              th Participant
-              each task in allTasks
-                th(colspan=2)= task.name
-                //-   div= task.name
-                //-   div
-                //-     div(data-col= 2 * colNumber + 1) Time
-                //-       button.js-sort Sort
-                //-     div Result file
-                //- - colNumber++
-              th.sort(data-col= 2 * allTasks.length + 1, rowspan=2) Total
-            tr
-              - var colNumber = 0
-              th
-              each task in allTasks
-                th.sort(data-col= 2 * colNumber + 1) Time
-                th Result file
-                - colNumber++
-
-          tbody
-            each user in users
-              tr(data-id=user.id)
-                td #{user.firstName} #{user.lastName}
-                //- - var totalTime = 0
+      if (allTasks.length)
+        div.scrollable
+          table.first-step-results(class=allTasks.length === 1 ? 'single' : '')
+            thead
+              tr
+                th Participant
                 each task in allTasks
-                  if user.tasks[task.id]
-                    //- - totalTime += user.tasks[task.id].time
-                    td.time
-                      span.sort-item= user.tasks[task.id].time
-                    td
-                      a.load-file(href="/saveFile/#{user.id}/#{task.id}") Download
-                      a.show(href="/showMarkup/#{user.id}/#{task.id}/") Show
-                  else
-                    td
-                    td
-                td.total
-                  span.sort-item
+                  th(colspan=2)= task.name
+                  //-   div= task.name
+                  //-   div
+                  //-     div(data-col= 2 * colNumber + 1) Time
+                  //-       button.js-sort Sort
+                  //-     div Result file
+                  //- - colNumber++
+                th.sort(data-col= 2 * allTasks.length + 1, rowspan=2) Total
+              tr
+                - var colNumber = 0
+                th
+                each task in allTasks
+                  th.sort(data-col= 2 * colNumber + 1) Time
+                  th Result file
+                  - colNumber++
+
+            tbody
+              each user in users
+                tr(data-id=user.id)
+                  td #{user.firstName} #{user.lastName}
+                  //- - var totalTime = 0
+                  each task in allTasks
+                    if user.tasks[task.id]
+                      //- - totalTime += user.tasks[task.id].time
+                      td.time
+                        span.sort-item= user.tasks[task.id].time
+                      td
+                        a.load-file(href="/saveFile/#{user.id}/#{task.id}") Download
+                        a.show(href="/showMarkup/#{user.id}/#{task.id}/") Show
+                    else
+                      td
+                      td
+                  td.total
+                    span.sort-item
+      else
+        .tasks-empty
+          | No active tasks

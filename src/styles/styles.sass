@@ -814,7 +814,7 @@ button
   border: 1px solid $editors-border-color
   background: white
   position: relative
-  >div
+  >div.scrollable
     overflow-x: auto
     overflow-y: visible
     margin-left: 270px
@@ -894,9 +894,34 @@ button
     th
       width: 300px
 
+  .first-step-results.single
+    thead
+      tr:first-child
+        th:first-child
+          width: 558px
+    td:first-child
+      width: 558px
+
+
   .quiz-results
     th
       width: 450px
+
+  .quiz-results.single
+    thead
+      tr:first-child
+        th:first-child
+          width: 408px
+    td:first-child
+      width: 408px
+
+.tasks-empty
+  margin: 12px
+  font-family: $font-family-source-sans-pro
+
+textarea
+  font-family: $font-family-source-sans-pro
+  font-size: 14px
 
 .load-file
   margin-right: 10px
@@ -954,6 +979,7 @@ button
   font-family: "Lucida Console", monospace
   font-size: 16px
   table-layout: auto
+  border: none
 
   tr
     background: white

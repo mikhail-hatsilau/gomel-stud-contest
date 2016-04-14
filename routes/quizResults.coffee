@@ -34,7 +34,7 @@ module.exports = (next) ->
       tasksRows[0].answares,
       tasksRows[0].deprecatedSelectors,
       tasksRows[0].htmlCode,
-      tasksRows[0].active,
+      tasksRows[0].active
     )
 
     taskInfo = {}
@@ -47,11 +47,20 @@ module.exports = (next) ->
   resp = yield db.getActiveTasks QUIZ_STEP_ID
   rows = resp[0]
 
-  allTasks = rows.map (element) ->
-    {
-      id: element.id,
-      name: element.name
-    }
+  allTasks = for row in rows
+    task = new QuizStepTask(
+      row.id,
+      row.name,
+      row.displayNumber,
+      row.weight,
+      row.answares,
+      row.deprecatedSelectors,
+      row.htmlCode,
+      row.active
+    )
+
+  allTasks.sort (a, b) ->
+    a.displayNumber - b.displayNumber
 
   yield this.render 'quizResults', {
     users: users,

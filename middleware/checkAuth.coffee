@@ -5,4 +5,4 @@ module.exports = (next) ->
   if this.isAuthenticated()
     yield next
   else
-    this.throw 'Forbidden', 403
+    this.redirect '/'
