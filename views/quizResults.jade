@@ -30,44 +30,46 @@ block content
         .admin-timer Time Spent
           span 00:00 
     .scrollable-table
-      table.quiz-results
-        thead
-          tr
-            th(rowspan=2) Participant
-            each task in allTasks
-              th(colspan=3)= task.name
-                //- div= task.name
-                //- div
-                //-   //- div(data-col= ++colNumber) Weight
-                //-   //-   button.js-sort Sort
-                //-   div(data-col= ++colNumber) Time
-                //-     button.js-sort Sort
-                //-   div(data-col= ++colNumber) Selector
-                //-   div(data-col= ++colNumber) Length
-                //-     button.js-sort Sort
-            th.sort(data-col= 3 * allTasks.length + 1, rowspan=2) Total
-          tr
-            - var colNumber = 0
-            each task in allTasks
-              th.sort(data-col = ++colNumber) Time
-              th(data-col = ++colNumber) Selector
-              th.sort(data-col = ++colNumber) Length
-        tbody
-          each user in users
-            tr(data-id=user.id)
-              td= user.firstName + ' ' + user.lastName
+      div
+        table.quiz-results
+          thead
+            tr
+              th Participant
               each task in allTasks
-                if user.tasks[task.id]
-                  //- td
-                  //-   span.sort-item= user.tasks[task.id].task.weight
-                  td.time(data-taskid = task.id)
-                    span.sort-item= user.tasks[task.id].time
-                  td.selector(data-taskid = task.id)= user.tasks[task.id].selector
-                  td.selector-length(data-taskid = task.id)
-                    span.sort-item= user.tasks[task.id].selector.length
-                else
-                  td.time(data-taskid= task.id)
-                  td.selector(data-taskid= task.id)
-                  td.selector-length(data-taskid= task.id)
-              td.total
-                span.sort-item
+                th(colspan=3)= task.name
+                  //- div= task.name
+                  //- div
+                  //-   //- div(data-col= ++colNumber) Weight
+                  //-   //-   button.js-sort Sort
+                  //-   div(data-col= ++colNumber) Time
+                  //-     button.js-sort Sort
+                  //-   div(data-col= ++colNumber) Selector
+                  //-   div(data-col= ++colNumber) Length
+                  //-     button.js-sort Sort
+              th.sort(data-col= 3 * allTasks.length + 1, rowspan=2) Total
+            tr
+              - var colNumber = 0
+                th
+              each task in allTasks
+                th.sort(data-col = ++colNumber) Time
+                th(data-col = ++colNumber) Selector
+                th.sort(data-col = ++colNumber) Length
+          tbody
+            each user in users
+              tr(data-id=user.id)
+                td= user.firstName + ' ' + user.lastName
+                each task in allTasks
+                  if user.tasks[task.id]
+                    //- td
+                    //-   span.sort-item= user.tasks[task.id].task.weight
+                    td.time(data-taskid = task.id)
+                      span.sort-item= user.tasks[task.id].time
+                    td.selector(data-taskid = task.id, title = user.tasks[task.id].selector)= user.tasks[task.id].selector
+                    td.selector-length(data-taskid = task.id)
+                      span.sort-item= user.tasks[task.id].selector.length
+                  else
+                    td.time(data-taskid= task.id)
+                    td.selector(data-taskid= task.id)
+                    td.selector-length(data-taskid= task.id)
+                td.total
+                  span.sort-item

@@ -3,11 +3,11 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300)
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300)
 
-@import node_modules/muicss/lib/sass/mui-colors
+// @import node_modules/muicss/lib/sass/mui-colors
 
-$mui-primary-color: mui-color('teal', '500')
+// $mui-primary-color: mui-color('teal', '500')
 
-@import node_modules/muicss/lib/sass/mui
+// @import node_modules/muicss/lib/sass/mui
 
 $header-height: 60px
 $content-padding: 20px
@@ -27,7 +27,8 @@ $warning-color: #B22746
 $header-text-color: #393D2E
 $light-blue-color: #1A9CB0
 $dark-blue-color: #063C44
-$task-color: #576061
+$raspberry-color: #B22746
+$gray-color: #576061
 $placeholder-color: #AFAFAF
 $heading-color: #444C4D
 
@@ -35,8 +36,13 @@ html, body
   margin: 0
   padding: 0
 
+*
+  box-sizing: border-box
+
 body
   background: $background-color
+  font-family: $font-family-oswald
+  font-size: 14px
 
 :-webkit-input-placeholder
   color: $placeholder-color
@@ -115,6 +121,7 @@ body
           position: absolute
           top: $header-height + 2px
           z-index: 10
+          border: 1px solid $editors-border-color
 
           a
             width: 150px
@@ -364,7 +371,7 @@ div.editor:only-child
 .sort
   position: relative
   cursor: pointer
-  padding-right: 15px
+  padding-right: 20px
 
   &:after
     content: ""
@@ -375,12 +382,12 @@ div.editor:only-child
     margin: auto
     height: 0
     width: 0
-    border-top: 5px solid black
+    border-top: 5px solid $heading-color
     border-left: 5px solid transparent
     border-right: 5px solid transparent
 
 .sort.ascending:after
-  border-bottom: 5px solid black
+  border-bottom: 5px solid $heading-color
   border-top: 0
 
 .to-do-block
@@ -418,6 +425,7 @@ h1
   color: $heading-color
   margin: 18px 0 18px
   text-transform: uppercase
+  font-weight: normal
 
   button
     float: right
@@ -554,14 +562,14 @@ h1
     border-bottom: 1px solid $editors-border-color
     font-size: 18.7px
     background: white
-    color: $task-color
+    color: $gray-color
     font-weight: 300
 
   .ui-dialog-content
     padding: 14px 24px 24px
     font-size: 16px
     font-family: $roboto-font-family
-    color: $task-color
+    color: $gray-color
     font-weight: 300
 
 // Popup
@@ -652,16 +660,10 @@ h1
 
 .popup-actions
   text-align: right
-  button
-    color: $mui-primary-color
 
 #removeConfirmationDialog
   >div
     display: inline-block
-
-  .icon
-    color: $mui-primary-color
-    margin-right: 10px
 
 // Edit tasks page
 .task-info
@@ -780,13 +782,21 @@ div.quiz-task-time
 table.bordered
   tr
     th, td
-      border: 1px solid $mui-divider-color
+      border: 1px solid $editors-border-color
 
 table
   table-layout: fixed
   width: 100%
   border: 1px solid $editors-border-color
   background: white
+  border-collapse: collapse
+  border-spacing: 0
+  font-family: $font-family-source-sans-pro
+
+  th
+    font-weight: bold
+    text-align: left
+    color: $heading-color
 
   th, td
     padding: 12px
@@ -794,19 +804,39 @@ table
     tr:last-child
       border-bottom: 1px solid $editors-border-color
 
+label
+  font-family: $font-family-source-sans-pro
+
+button
+  cursor: pointer
+
 .scrollable-table
   border: 1px solid $editors-border-color
   background: white
-  overflow-x: auto
-  overflow-y: visible
+  position: relative
+  >div
+    overflow-x: auto
+    overflow-y: visible
+    margin-left: 270px
   table
     table-layout: fixed
     width: 100%
     border: none
+    border-collapse: separate
     thead
       tr:first-child
         th
-          border-top: none
+          &:first-child
+            position: absolute
+            left: 0
+            top: 0
+            height: 80px
+            line-height: 55px
+            border-right: 1px solid $editors-border-color
+
+      tr:nth-child(2)
+        th:first-child
+          border: none
 
     th:first-child, td:first-child
       border-left: none
@@ -816,11 +846,14 @@ table
 
     tr
       th, td
-        border: 1px solid $mui-divider-color
+        border-bottom: 1px solid $editors-border-color
+        border-left: 1px solid $editors-border-color
         padding: 12px
+        line-height: 1em
 
       th
         text-align: center
+        height: 40px
 
         &:last-child
           border-right: none
@@ -829,18 +862,32 @@ table
         &:first-child
           width: 270px
 
+        &:nth-child(2)
+          border-left: none
+
       td
-        // overflow: hidden
-        // text-overflow: ellipsis
-        // white-space: nowrap
-        word-break: break-all
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        height: 50px
         &:last-child
           border-right: none
+
+        &:first-child
+          position: absolute
+          left: 0
+          width: 270px
+          height: 50px
+          line-height: 25px
+          border-right: 1px solid $editors-border-color
+
+        &:nth-child(2)
+          border-left: none
 
   .total-results
     td
       input
-        display: inline-block
+        border: 1px solid $editors-border-color
         width: 100%
 
   .first-step-results
@@ -862,6 +909,7 @@ table
   padding: 20px
   display: none
   border: 1px solid $editors-border-color
+  font-family: $font-family-source-sans-pro
 
   >div
     display: inline-block
@@ -871,10 +919,10 @@ table
     margin-right: 10px
 
     .fa-check
-      color: mui-color('green', '500')
+      color: $lime-green-color
 
     .fa-remove
-      color: mui-color('red', '500');
+      color: $raspberry-color
 
 // Waiting quiz page
 .quiz-logo
@@ -953,6 +1001,7 @@ table
 .explanation
   margin: 12px 0 24px
   text-align: right
+  font-family: $font-family-source-sans-pro
 
   >div
     display: inline-block
@@ -1001,7 +1050,7 @@ table
   span
     margin-left: 12px
 
-.selector
+.selector-value
   padding: 12px
   outline: none
   border: 1px solid $editors-border-color

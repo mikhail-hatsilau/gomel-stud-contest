@@ -7,6 +7,7 @@ QUIZ_TABLE = "Quiz"
 ROLES_TABLE = "Roles"
 MARKS_TABLE = "Marks"
 TASKS_TABLE = "Tasks"
+STEPS_TABLE = "Steps"
 FIRST_STEP_TABLE = "FirstStep"
 
 FIRST_STEP_ID = 1
@@ -157,6 +158,10 @@ module.exports.getActiveTasksPromise = (stepId) ->
 
 module.exports.getAllTasks = ->
   QUERY = "SELECT * FROM #{TASKS_TABLE};"
+  connection.query QUERY
+
+module.exports.getAllSteps = ->
+  QUERY = "SELECT * FROM #{STEPS_TABLE};"
   connection.query QUERY
 
 module.exports.addFirstStepTask = (taskName, displayNumber, weight, htmlCode, cssCode, toDo) ->

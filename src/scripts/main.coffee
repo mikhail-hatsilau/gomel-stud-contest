@@ -468,9 +468,10 @@ $(->
     participant = editElement.parents('tr')
     textElement = editElement.siblings 'span'
     value = +editElement.val()
+    taskId = editElement.parent('td').data 'taskid'
+    stepId = editElement.parent('td').data 'stepid'
     if not (value is +textElement.text())
       userId = participant.data 'id'
-      taskId = editElement.parent('td').data 'taskid'
       $.ajax {
         url: '/saveResults',
         method: 'POST',
@@ -483,21 +484,20 @@ $(->
         .fail ->
           console.log 'Error occured while saving results'
     textElement.text value
-    totalTextElementStep1 = participant.find('.step1-sum').find 'span'
-    totalTextElementStep2 = participant.find('.step2-sum').find 'span'
+    stepTotalMarkElement = participant.find(".sum[data-stepid=#{stepId}]").find 'span'
     totalMarkElement = participant.find('.total-mark').find 'span'
-    elementsWithMarkStep1 = participant.find('.step1-task').find('span')
-    elementsWithMarkStep2 = participant.find('.step2-task').find('span')
-    console.log participant
-    totalMarkStep1 = 0
-    totalMarkStep2 = 0
-    for element in elementsWithMarkStep1
-      totalMarkStep1 += +$(element).text()
-    for element in elementsWithMarkStep2
-      totalMarkStep2 += +$(element).text()
-    totalTextElementStep1.text totalMarkStep1
-    totalTextElementStep2.text totalMarkStep2
-    totalMarkElement.text totalMarkStep1 + totalMarkStep2
+    elementsWithMarkOfCurrentStep = participant.find(".task[data-stepid=#{stepId}]").find('span')
+
+    stepTotalMark = 0
+    for element in elementsWithMarkOfCurrentStep
+      stepTotalMark += +$(element).text()
+    stepTotalMarkElement.text stepTotalMark
+
+    allStepsTotalElements = participant.find(".sum").find "span"
+    totalMark = 0
+    for element in allStepsTotalElements
+      totalMark += +$(element).text()
+    totalMarkElement.text totalMark
     editElement.remove()
     textElement.show()
 
@@ -744,6 +744,7 @@ $(->
 
     participant
       .find "td.selector[data-taskid=#{data.results.taskId}]"
+      .attr "title", data.results.selector
       .empty()
       .text data.results.selector
 

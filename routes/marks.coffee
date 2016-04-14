@@ -3,11 +3,10 @@ User = require '../models/user'
 Role = require '../models/role'
 FirstStepTask = require '../models/firstStepTask'
 QuizStepTask = require '../models/quizStepTask'
+Step = require '../models/step'
+Task = require '../models/task'
 
 module.exports.marks = (next) ->
-  FIRST_STEP_ID = 1
-  QUIZ_STEP_ID = 2
-
   resp = yield db.getAllStudents()
   rows = resp[0]
 
@@ -33,50 +32,92 @@ module.exports.marks = (next) ->
 
     users.push user
 
-  tasks = {}
-  tasks.step1 = []
-  tasks.step2 = []
+  # tasks.step1 = []
+  # tasks.step2 = []
+  resp = yield db.getAllSteps()
+  steps = for row in resp[0]
+    step = new Step row.id, row.name
 
-  resp = yield db.getActiveTasks FIRST_STEP_ID
-  rows = resp[0]
+  for step in steps
+    resp = yield db.getActiveTasks step.id
+    tasks = for row in resp[0]
+      if row.answares is null and step.name isnt 'HomeStep'
+        task = new FirstStepTask(
+          row.id,
+          row.name,
+          row.displayNumber,
+          row.weight,
+          row.htmlCode,
+          row.cssCode,
+          row.toDo,
+          row.active
+        )
+      else if row.answares isnt null
+        task = new QuizStepTask(
+          row.id,
+          row.name,
+          row.displayNumber,
+          row.weight,
+          row.answares,
+          row.deprecatedSelectors,
+          row.htmlCode,
+          row.active
+        )
+      else
+        task = new Task(
+          row.id,
+          row.name,
+          row.displayNumber,
+          row.weight,
+          row.active
+        )
+    tasks.sort (a, b) ->
+      a.displayNumber - b.displayNumber
+    step.tasks = tasks
 
-  for row in rows
-    task = new FirstStepTask(
-      row.id,
-      row.name,
-      row.displayNumber,
-      row.weight, 
-      row.htmlCode,
-      row.cssCode,
-      row.toDo, 
-      row.active
-    )
-    tasks.step1.push task
+  console.log steps
+  #
+  #
+  # resp = yield db.getActiveTasks FIRST_STEP_ID
+  # rows = resp[0]
+  #
+  # for row in rows
+  #   task = new FirstStepTask(
+  #     row.id,
+  #     row.name,
+  #     row.displayNumber,
+  #     row.weight,
+  #     row.htmlCode,
+  #     row.cssCode,
+  #     row.toDo,
+  #     row.active
+  #   )
+  #   tasks.step1.push task
+  #
+  # resp = yield db.getActiveTasks QUIZ_STEP_ID
+  # rows = resp[0]
+  #
+  # for row in rows
+  #   task = new QuizStepTask(
+  #     row.id,
+  #     row.name,
+  #     row.displayNumber,
+  #     row.weight,
+  #     row.answares,
+  #     row.deprecatedSelectors,
+  #     row.htmlCode
+  #   )
+  #   tasks.step2.push task
 
-  resp = yield db.getActiveTasks QUIZ_STEP_ID
-  rows = resp[0]
-
-  for row in rows
-    task = new QuizStepTask(
-      row.id,
-      row.name,
-      row.displayNumber,
-      row.weight, 
-      row.answares,
-      row.deprecatedSelectors,
-      row.htmlCode 
-    )
-    tasks.step2.push task
-
-  tasks.step1.sort (a, b) ->
-    a.displayNumber - b.displayNumber
-
-  tasks.step2.sort (a, b) ->
-    a.displayNumber - b.displayNumber
+  # tasks.step1.sort (a, b) ->
+  #   a.displayNumber - b.displayNumber
+  #
+  # tasks.step2.sort (a, b) ->
+  #   a.displayNumber - b.displayNumber
 
   yield this.render 'total', {
     users: users,
-    tasks: tasks 
+    steps: steps
   }
 
 module.exports.save = (next) ->

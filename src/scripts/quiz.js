@@ -257,7 +257,7 @@ $(function (){
 		}
 	};
 
-	$('.selector').first().focus().keyup(function (){
+	$('.selector-value').first().focus().keyup(function (){
 		runSelector($(this).val());
 	});
 
