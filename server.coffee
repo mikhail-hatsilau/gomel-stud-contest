@@ -25,7 +25,6 @@ app.use json()
 app.use koaBody
 app.use validate()
 app.keys = ['contest']
-# app.use session(app)
 
 app.use(views path.join(__dirname, '/views') , {
   extension: 'jade'
@@ -97,7 +96,6 @@ io.on 'connection', (socket) ->
     QUIZ_STEP_ID = 2
     db.getActiveTasksPromise QUIZ_STEP_ID
       .then (resp) ->
-        # db.clearQuizResults()
         tasks = getTasks resp[0]
         io.to('admin room').emit 'init board'
         io.to('students room').emit 'init'
@@ -115,8 +113,6 @@ io.on 'connection', (socket) ->
         }
 
   socket.on 'next task', (data, callback) ->
-    # io.to 'ready room'
-    #   .emit 'next', time * 1000
     io.to 'ready room'
       .emit 'next', {
         time: data.timeLimit,

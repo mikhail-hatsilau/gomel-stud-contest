@@ -32,8 +32,6 @@ module.exports.marks = (next) ->
 
     users.push user
 
-  # tasks.step1 = []
-  # tasks.step2 = []
   resp = yield db.getAllSteps()
   steps = for row in resp[0]
     step = new Step row.id, row.name
@@ -74,46 +72,6 @@ module.exports.marks = (next) ->
     tasks.sort (a, b) ->
       a.displayNumber - b.displayNumber
     step.tasks = tasks
-
-  console.log steps
-  #
-  #
-  # resp = yield db.getActiveTasks FIRST_STEP_ID
-  # rows = resp[0]
-  #
-  # for row in rows
-  #   task = new FirstStepTask(
-  #     row.id,
-  #     row.name,
-  #     row.displayNumber,
-  #     row.weight,
-  #     row.htmlCode,
-  #     row.cssCode,
-  #     row.toDo,
-  #     row.active
-  #   )
-  #   tasks.step1.push task
-  #
-  # resp = yield db.getActiveTasks QUIZ_STEP_ID
-  # rows = resp[0]
-  #
-  # for row in rows
-  #   task = new QuizStepTask(
-  #     row.id,
-  #     row.name,
-  #     row.displayNumber,
-  #     row.weight,
-  #     row.answares,
-  #     row.deprecatedSelectors,
-  #     row.htmlCode
-  #   )
-  #   tasks.step2.push task
-
-  # tasks.step1.sort (a, b) ->
-  #   a.displayNumber - b.displayNumber
-  #
-  # tasks.step2.sort (a, b) ->
-  #   a.displayNumber - b.displayNumber
 
   yield this.render 'total', {
     users: users,

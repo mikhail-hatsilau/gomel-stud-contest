@@ -135,10 +135,6 @@ saveTaskResults = () ->
       console.log 'Error while saving task results'
       clearLocalStorageItem 'firstStepStartTime'
 
-# startQuiz = ->
-#   clearLocalStorageItem 'taskNumber'
-#   location.href = '/quiz'
-
 parseTime = (time) ->
   minutes = parseInt time / 60
   seconds = time - minutes * 60

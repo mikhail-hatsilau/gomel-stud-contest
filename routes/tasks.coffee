@@ -11,7 +11,6 @@ module.exports.getFirstStepTasks = (next) ->
     task = new FirstStepTask row.id, row.name, row.displayNumber, row.weight, row.htmlCode, row.cssCode, row.toDo, row.active
     tasks.push task
 
-  console.log tasks
   yield this.render 'firstStepTasks', { tasks: tasks }
 
 module.exports.getQuizTasks = (next) ->
@@ -48,7 +47,6 @@ module.exports.editQuizStepTask = (next) ->
   if not rows.length
     this.throw 'No such task', 404
   task = new QuizStepTask rows[0].id, rows[0].name, rows[0].displayNumber, rows[0].weight, rows[0].answares, rows[0].deprecatedSelectors, rows[0].htmlCode, rows[0].active
-  console.log task
   yield this.render 'quizStepEditTask', { task: task }
 
 module.exports.saveFirstStepTask = (next) ->
@@ -78,8 +76,7 @@ module.exports.saveQuizStepTask = (next) ->
 
   resp = yield db.addQuizStepTask(taskName, displayNumber, weight, answares, deprecatedSelectors, htmlCode)
 
-  task = new QuizStepTask resp[0].insertId, taskName, displayNumber, weight, htmlCode, answares, deprecatedSelectors, 
-  console.log task
+  task = new QuizStepTask resp[0].insertId, taskName, displayNumber, weight, htmlCode, answares, deprecatedSelectors
 
   this.body = 
     status: 'ok'

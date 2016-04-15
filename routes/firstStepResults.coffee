@@ -105,8 +105,6 @@ module.exports.showMarkup = (next) ->
     role
   )
 
-  console.log user
-
   yield this.render 'resultsMarkup', {
     task: task,
     userInfo: user,

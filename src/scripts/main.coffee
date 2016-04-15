@@ -3,33 +3,6 @@ _ = require 'lodash'
 require 'jquery-ui'
 statusPopup = require('./statusPopup')()
 $(->
-  # # Validates fields in the sign in form
-  # validate = ->
-  #   fields = [].slice.call arguments, 0
-  #   valid = true
-
-  #   # Sets error class to parent of an invalid element
-  #   # and shows appropriate message
-  #   showError = (element, error) ->
-  #     errorElement = $('<span>').text error
-  #     element.parent 'div'
-  #       .addClass 'error'
-  #       .append errorElement
-
-  #   for field in fields
-  #     if not field.val().trim()
-  #       showError(field, 'This field is required')
-  #       valid = false
-
-  #   valid
-
-  # # Removes all validation errors
-  # removeValidationErrors = (form) ->
-  #   errors = form.find('.error').removeClass('error').find 'span'
-
-  #   if errors
-  #     for error in errors
-  #       error.remove()
 
   intervalId = undefined
 
@@ -76,11 +49,7 @@ $(->
   $('.sign-in').on 'submit', (event) ->
     event.preventDefault()
 
-    #removeValidationErrors $(this)
     serverErrorElement = $('.server-error').empty()
-
-    # if not validate $('input[name=username]'), $('input[name=password]')
-    #   return
 
     $.ajax {
       url: $(this).attr('action'),
@@ -119,17 +88,11 @@ $(->
     $('.dropdown-menu').slideUp()
 
   $('a[data-toggle="dropdown"]').on 'click', (event) ->
-    # $('.dropdown-menu').slideUp()
     dropdownMenu = $(this).next '.dropdown-menu'
     dropdownMenu.slideToggle()
     event.stopPropagation()
 
   addUser = (form) ->
-    # removeValidationErrors $(form)
-    # valid = validate($('#username'), $('#password'), $('#firstName'), $('#lastName'))
-    # if not valid
-    #   return
-
     $.ajax {
       url: $(form).attr('action'),
       method: 'POST',
@@ -361,7 +324,6 @@ $(->
 
   stopTask = ->
     clearInterval intervalId
-    # $('.admin-timer').find('span').text '00:00'
     $('.stop-quiz-task').prop 'disabled', true
     if not currentTasks.length
       $('.start-quiz-btn').prop 'disabled', true
@@ -369,20 +331,6 @@ $(->
     else
       $('.start-quiz-btn').prop 'disabled', false
       localStorage.setItem 'currentQuizTask', currentTasks[0].id
-
-  # fillQuizBoardTable = ->
-  #   board = $('.participants-list')
-  #   board
-  #     .find 'tbody'
-  #     .empty()
-  #   headRow = board.find('thead').find('tr').empty()
-  #
-  #   headRow.append $('<th />').text('Participant')
-  #
-  #   # for task in allTasks
-  #   #   headRow.append $('<th />').text(task.name)
-  #
-  #   headRow.append $('<th />').text('Total time')
 
   $('.init-quiz').on 'click', (event) ->
     users.length = 0
@@ -421,26 +369,7 @@ $(->
 
   $('.stop-quiz-task').on 'click', ->
     socketIo.emit 'stop task', null, ->
-      # $('.start-quiz-btn').prop 'disabled', false
       stopTask()
-      # $('.next-quiz-task').prop 'disabled', true
-
-  # $('.next-quiz-task').on 'click', ->
-  #   timeLimit = $('.quiz-task-time').find('input').val()
-  #   task = allTasks.shift()
-
-  #   emitNextTaskEvent({
-  #     timeLimit: timeLimit,
-  #     taskId: task.id
-  #   }, ->
-  #     $('.stop-quiz-task').prop 'disabled', false
-  #     setTimeout setTimer, 500
-  #   )
-
-  #   $('.current-task').find('span').text task.name
-
-  #   if not allTasks.length
-  #     $(this).prop 'disabled', true
 
   $('.clear-quiz-results').on 'click', ->
     $.post '/clearQuiz'
@@ -626,21 +555,11 @@ $(->
       return
     participant = $('<tr class="participant" data-id=' + user.id + ' />')
     participant.append $('<td />').text(user.firstName + ' ' + user.lastName)
-    # for task in allTasks
-    #   participant.append $("<td data-taskid=#{task.id}/>")
+
     totalTimeOfUser = getTotalTime(user.results)
     participant.append $('<td class="total" />').text parseTime(totalTimeOfUser)
     participant.attr 'data-total', totalTimeOfUser
     participant.appendTo participantsList
-
-    # for result in user.results
-    #   passedTaskColumn = participant.find "td[data-taskid=#{result.task}]"
-    #   if result.selector.length
-    #     passedTaskColumn
-    #       .append $('<span class="time"/>').text(parseTime(result.time))
-    #       .append $('<span class="selector-length"/>').text(result.selector.length)
-    #   else
-    #     passedTaskColumn.text FAIL_SYMBOL
 
   addUserResultsTable = (user) ->
     resultsTable = $('.quiz-results')
@@ -665,7 +584,6 @@ $(->
   socketIo.on 'add user', (data) ->
     user = data.user
     user.results = data.results
-    # users.push user
 
     if $('.participants-list').length
       addUserBoard(user)
@@ -701,17 +619,7 @@ $(->
       , 500)
 
     taskResult.append(time).append(selectorLength)
-    #
-    # columns.splice(0, 1)
-    # columns.splice(-1, 1)
 
-    # totalTime = columns.reduce((sum, current)->
-    #   timeCell = $(current).find('.time')
-    #   if timeCell.text() is FAIL_SYMBOL
-    #     sum += +timeCell.data 'limit'
-    #   else
-    #     sum += convertTimeToSeconds(timeCell.text())
-    # , 0)
     totalTimeOfUser = (+participant.attr('data-total') - data.results.timeLimit) + parseInt(data.results.time)
     participant.find('.total').text parseTime(totalTimeOfUser)
     participant.attr 'data-total', totalTimeOfUser
@@ -761,14 +669,6 @@ $(->
   # Event from the server. When user passes one test of the quiz this function is called
   # and adds results to the list
   socketIo.on 'test passed', (data) ->
-    # userIndex = _.findIndex users, { id: data.user.id }
-    # user = users[userIndex]
-    # resultIndex = _.findIndex user.results, { task: data.results.taskId }
-    # console.log resultIndex
-    # if resultIndex isnt -1
-    #   user.results[resultIndex] = data.results
-    # else
-    #   user.results.push data.results
     if $('.participants-list').length
       updateBoard(data)
 
@@ -779,7 +679,6 @@ $(->
 
   socketIo.on 'init', ->
     localStorage.clear()
-    # socketIo.emit 'ready'
     location.replace '/readyQuiz'
 
   socketIo.on 'init board', ->
