@@ -10,6 +10,7 @@ $(function (){
 	var forbiddenFlag = true;
 	var savedTime;
 	var timeLimit = parseInt(localStorage.getItem('timeLimit'));
+	var completed = false;
 
 	String.prototype.replaceAll = function (exp, str) {
 		return this.split(exp).join(str);
@@ -211,6 +212,9 @@ $(function (){
 	}
 
 	var runSelector = function (selector) {
+		if (completed) {
+			return;
+		}
 		$('.html-code tr').removeClass('selected');
 		try {
 			for (var i = 0; i < forbidden.length; i++) {
@@ -225,7 +229,7 @@ $(function (){
 					forbiddenFlag = true;
 				}
 			}
-			var result = rootNode[0].querySelectorAll(selector);
+			var result = rootNode.find(selector);
 			for (var i = 0; i < result.length; i++) {
 				$('tr:nth-child(' + (+$(result[i]).attr('data-csstest-row') + 1) + ')').addClass('selected');
 			}
@@ -233,6 +237,7 @@ $(function (){
 			console.log(e);
 		}
 		if (checkForWelldone(selector)) {
+			completed = true;
 			completeTask();
 		}
 	};
@@ -240,7 +245,6 @@ $(function (){
 	$('.selector-value').keyup(function (event){
 		SHIFT_KEY_CODE = 16
 		if (event.which !== SHIFT_KEY_CODE) {
-			console.log('run');
 			runSelector($(this).val());
 		}
 	});
