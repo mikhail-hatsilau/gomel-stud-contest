@@ -35,7 +35,7 @@ CREATE TABLE `FirstStep` (
   KEY `task` (`task`),
   CONSTRAINT `FirstStep_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `FirstStep_ibfk_4` FOREIGN KEY (`task`) REFERENCES `Tasks` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=444 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=448 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,7 +64,7 @@ CREATE TABLE `Marks` (
   KEY `task_id` (`task_id`),
   CONSTRAINT `Marks_ibfk_4` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `Marks_ibfk_5` FOREIGN KEY (`task_id`) REFERENCES `Tasks` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -73,6 +73,7 @@ CREATE TABLE `Marks` (
 
 LOCK TABLES `Marks` WRITE;
 /*!40000 ALTER TABLE `Marks` DISABLE KEYS */;
+INSERT INTO `Marks` VALUES (31,106,12,3),(32,107,12,7),(33,108,12,5),(34,109,12,5),(35,110,12,3),(36,111,12,7);
 /*!40000 ALTER TABLE `Marks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -94,7 +95,7 @@ CREATE TABLE `Quiz` (
   KEY `task` (`task`),
   CONSTRAINT `Quiz_ibfk_3` FOREIGN KEY (`stud_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `Quiz_ibfk_4` FOREIGN KEY (`task`) REFERENCES `Tasks` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=752 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=781 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -207,7 +208,7 @@ CREATE TABLE `Users` (
   PRIMARY KEY (`id`),
   KEY `role` (`role`),
   CONSTRAINT `Users_ibfk_1` FOREIGN KEY (`role`) REFERENCES `Roles` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -229,4 +230,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-15 15:32:23
+-- Dump completed on 2016-04-15 18:22:47
