@@ -65,7 +65,6 @@ module.exports.passForm = (next) ->
     this.session.passedForm = true
     if requestBody.firstName is currentUser.firstName and
     requestBody.lastName is currentUser.lastName
-      # this.session.firstStepPassed = true
       this.body =
         status: 'ok'
         message: 'You successfully passed the form. You will be redirected to the home page in 30 seconds.'
