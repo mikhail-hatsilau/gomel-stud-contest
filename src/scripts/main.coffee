@@ -88,7 +88,6 @@ $(->
       data: $(this).serialize()
     }
       .done ->
-        console.log('submitted')
         location.href = '/'
       .fail (xhr) ->
         serverErrorElement.text xhr.responseJSON.message
@@ -168,7 +167,6 @@ $(->
 
   loadRoles = (callback) ->
     dialog = $(this)
-    console.log dialog
     $.get '/roles'
       .done (resp) ->
         select = dialog.find '.roles'
@@ -230,7 +228,6 @@ $(->
         console.log "Error occured"
 
   fillEditUserPopup = (dialog) ->
-    console.log 'load'
     rolesLoadedCallback = =>
       userId = $(this).parents('tr').data 'id'
 
@@ -282,7 +279,6 @@ $(->
 
     # Open add user popup
     $('.edit-user').on 'click', (event) ->
-      console.log 'edit-btn'
       fillEditUserPopup.call this, dialog
       dialog.dialog 'open'
 
@@ -506,7 +502,6 @@ $(->
     saveResults this
 
   editMarkCallback = (event) ->
-    console.log $(event.target)
     if $(this)[0] is $(event.target)[0] or $(event.target)[0] is $(this).find('span')[0]
       saveResults $(event.currentTarget).parents '.total-results'
       textElement = $(event.currentTarget).find('span')
@@ -519,7 +514,6 @@ $(->
 
   # Result sorting
   $('.sort').on 'click', (event) ->
-    console.log 'sort'
     timeRegExp = /\d{2}:\d{2}/
     ascendingOrder = (a, b) ->
       sortColumnA = $(a).find('td')[colNumber]
@@ -671,7 +665,7 @@ $(->
   socketIo.on 'add user', (data) ->
     user = data.user
     user.results = data.results
-    users.push user
+    # users.push user
 
     if $('.participants-list').length
       addUserBoard(user)
@@ -699,7 +693,7 @@ $(->
         participant.css 'background-color', ''
       , 500)
     else
-      time.text parseTime(data.results.time)
+      time.text parseTime(parseInt(data.results.time))
       selectorLength.text data.results.selector.length
       participant.css 'background-color', '#b2ff59'
       setTimeout( ->
@@ -718,15 +712,13 @@ $(->
     #   else
     #     sum += convertTimeToSeconds(timeCell.text())
     # , 0)
-    totalTimeOfUser = (+participant.attr('data-total') - data.results.timeLimit) + data.results.time
+    totalTimeOfUser = (+participant.attr('data-total') - data.results.timeLimit) + parseInt(data.results.time)
     participant.find('.total').text parseTime(totalTimeOfUser)
     participant.attr 'data-total', totalTimeOfUser
 
     participantsRows.sort (a, b) ->
       totalTimeA = $(a).attr 'data-total'
       totalTimeB = $(b).attr 'data-total'
-      console.log "a: #{totalTimeA}"
-      console.log "b: #{totalTimeB}"
       parseInt(totalTimeA) - parseInt(totalTimeB)
 
     participantsRows.detach().appendTo participantsList
@@ -826,7 +818,6 @@ $(->
 
     for userRow in usersRows
       total = $(userRow).attr('data-total')
-      console.log +total + timeLimit
       $(userRow)
         .attr 'data-total', +total + timeLimit
 

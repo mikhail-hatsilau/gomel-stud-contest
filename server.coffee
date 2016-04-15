@@ -114,17 +114,6 @@ io.on 'connection', (socket) ->
           results: rows
         }
 
-  # socket.on 'begin', (time, callback) ->
-  #   # io.to 'ready room'
-  #   #   .emit 'start quiz', time * 60
-
-
-  #       callback tasks
-  #   io.to('ready room').emit 'next', {
-  #     time: time,
-  #     taskId: tasks[0].id
-  #   }
-
   socket.on 'next task', (data, callback) ->
     # io.to 'ready room'
     #   .emit 'next', time * 1000
@@ -158,7 +147,6 @@ io.on 'connection', (socket) ->
 
   socket.on 'stop task', (data, callback) ->
     io.to('students room').emit 'stop'
-    console.log callback
     callback()
 
   socket.on 'start step1', ->

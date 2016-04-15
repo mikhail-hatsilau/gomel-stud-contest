@@ -3,8 +3,6 @@ db = require '../database'
 FirstStepTask = require '../models/firstStepTask'
 
 module.exports.get = (next) ->
-  # if this.session.passedQuiz
-  #   this.throw 'Forbidden', 403
   yield this.render 'editor', { contentClass: 'editor-page' }
 
 module.exports.save = (next) ->
@@ -29,16 +27,13 @@ module.exports.next = (next) ->
 
   if not rows.length
     this.response.status = 404
-    this.body = 
+    this.body =
       status: 'error'
       message: 'No such task'
     return
 
-  # loop
-  #   resp = yield db.getTaskByDisplayNumber taskNumber, FIRST_STEP_ID
-  #   rows = resp[0]
-  #   taskNumber++
-  #   break if not rows.length or rows[0].active
+  rows.sort (a, b) ->
+    a.displayNumber - b.displayNumber
 
   task = new FirstStepTask(
     rows[0].id,
@@ -50,13 +45,6 @@ module.exports.next = (next) ->
     rows[0].toDo,
     rows[0].active
   )
-
-  # if not task.active
-  #   this.response.status = 403
-  #   this.body = 
-  #     status: 'Error'
-  #     message: 'Next task is not opened yet'
-  #   return 
 
   this.body =
     task: task
@@ -75,8 +63,9 @@ module.exports.passForm = (next) ->
   else
     currentUser = this.req.user
     this.session.passedForm = true
-    if requestBody.firstName is currentUser.firstName and 
+    if requestBody.firstName is currentUser.firstName and
     requestBody.lastName is currentUser.lastName
+      # this.session.firstStepPassed = true
       this.body =
         status: 'ok'
         message: 'You successfully passed the form. You will be redirected to the home page in 30 seconds.'

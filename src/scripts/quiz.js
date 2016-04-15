@@ -1,8 +1,6 @@
 $ = require('jquery');
 
 $(function (){
-
-	// var taskNumber = parseInt(localStorage.getItem('quizTaskNumber'));
 	var taskId = parseInt(localStorage.getItem('quizTaskId'));
 	var rootNode;
 	var startTime;
@@ -107,23 +105,7 @@ $(function (){
 	}
 
 	var showTask = function (){
-
-		// function finish() {
-		// 	localStorage.removeItem('quizTaskNumber');
-		// 	$.ajax({
-		// 		url: '/finishQuiz',
-		// 		method: 'POST'
-		// 	})
-		// 	.done(function(){
-		// 		location.href = '/finishResults'
-		// 	})
-		// 	.fail(function(){
-		// 		console.log('Error occured')
-		// 	});
-		// }
-
 		$.get("/quizTasks/" + taskId, function (data) {
-			// showHtmlBlock();
 			var START_TAG_REGEXP = /\<[a-zA-Z]+/g;
 			var matchResult;
 
@@ -170,10 +152,6 @@ $(function (){
 			}
 			rootNode = $("<div/>");
 			rootNode.append(linesWithRowNumber.join('\n'));
-			// $(rootNode).find('*').each(function (index){
-			// 	console.log(index);
-			// 	$(this).attr('data-csstest-row', index);
-			// });
 			for (var i = 0; i < lines.length; i++) {
 				var source = $("<div/>").text(lines[i]).html();
 				var html = "<tr><td class='line-num'>" + (i+1) + "</td><td><div class='flag'></div></td><td class='code'>" + formatHtml(source.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")) + "</td></tr>";
@@ -185,9 +163,6 @@ $(function (){
 				$('.html-code').append(codeElement);
 			}
 		}).fail(function (){
-			//finish();
-			//$('.html-wrapper').html("<span style='color: #fff;'>That's all! You are <span style='color: red;'>C</span><span style='color: green;'>S</span><span style='color: blue;'>S</span>-master :)</span>");
-			//location.replace('/readyQuiz');
 			console.log('Error');
 		});
 	};
@@ -198,15 +173,6 @@ $(function (){
 	});
 
 	function completeTask() {
-		// hideHtmlBlock();
-		// clearInterval(intervalId);
-		// localStorage.removeItem('quizTaskTime', timer);
-		// setTimeout(function () {
-		// 	showTask(++taskNumber);
-		// }, 400);
-		// $('.selector').val("");
-		// hideHtmlBlock();
-		// $('.selector').val("");
 		clearInterval(intervalId);
 		setTimeout(function(){
 			location.replace('/readyQuiz');
@@ -224,7 +190,6 @@ $(function (){
 			}
 			if (needed.length == $('.selected').length && forbiddenFlag) {
 				time = (new Date() - startTime)/1000;
-				clearInterval(intervalId);
 				emitEvent(taskId, time, selector, true);
 				return true;
 			} else {
@@ -272,8 +237,12 @@ $(function (){
 		}
 	};
 
-	$('.selector-value').first().focus().keyup(function (){
-		runSelector($(this).val());
+	$('.selector-value').keyup(function (event){
+		SHIFT_KEY_CODE = 16
+		if (event.which !== SHIFT_KEY_CODE) {
+			console.log('run');
+			runSelector($(this).val());
+		}
 	});
 
 	showTask();
