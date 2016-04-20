@@ -5,11 +5,15 @@ block title
 
 block content
   .container
-    h1 First step results
-    .scrollable-table
+    .head-controls
+      h1 First step results
+      .button-set
+        button.btn.btn-dark-green.start-first-step Start
+  .container-full
+    .scrollable-table(style="max-width: #{allTasks.length * 300 + 372}px;")
       if (allTasks.length)
         div.scrollable
-          table.first-step-results(class=allTasks.length === 1 ? 'single' : '')
+          table.first-step-results
             thead
               tr
                 th Participant

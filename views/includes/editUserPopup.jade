@@ -5,6 +5,10 @@ form.edit-user-form(action="/editUser", method="POST")
     input#edit-popup-username.edit-username(type="text", name="username", required)
   div.textfield
     .label
+      label(for="edit-popup-password") New password
+    input#edit-popup-password.edit-password(type="password", name="password")
+  div.textfield
+    .label
       label(for="edit-popup-firstname") First name
     input#edit-popup-firstname.edit-firstname(type="text", name="firstName", required)
   div.textfield

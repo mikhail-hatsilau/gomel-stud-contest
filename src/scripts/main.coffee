@@ -371,7 +371,7 @@ $(->
     socketIo.emit 'stop task', null, ->
       stopTask()
 
-  $('.clear-quiz-results').on 'click', ->
+  clearQuiz = ->
     $.post '/clearQuiz'
       .done (resp) ->
         statusPopup.showSuccessPopup resp.message
@@ -384,6 +384,23 @@ $(->
       .fail ->
         console.log 'Error ocured'
         statusPopup.showErrorPopup 'Results were not cleared'
+
+  $('.clear-quiz-results').on 'click', ->
+    removeConfirmationDialog.dialog 'option', 'title', 'Clear quiz results'
+    removeConfirmationDialog.dialog 'option', 'buttons', [
+      {
+        text: 'Clear',
+        click: ->
+          clearQuiz()
+          $(this).dialog 'close'
+      },
+      {
+        text: 'Close',
+        click: ->
+          $(this).dialog 'close'
+      }
+    ]
+    removeConfirmationDialog.dialog 'open'
 
   # saveResults function sends ajax for saving marks.
   # Also it hides inputs, shows spans and calculates total
@@ -533,11 +550,23 @@ $(->
         console.log 'Error occured'
         statusPopup.showErrorPopup 'Error'
 
-  # Event from the server. When user is ready to start quiz this function adds
-  # user to the list of ready users
+  $('.edit-mark').find('input').on 'blur', (event) ->
+    userInfoElement = $(this).parents '.user-task-info'
+    userId = userInfoElement.data 'userid'
+    taskId = userInfoElement.data 'taskid'
+
+    $.post '/saveResults', {
+      userId: userId,
+      taskId: taskId,
+      value: $(this).val()
+    }
+      .error ->
+        console.log 'Error occured'
+
 
   $('.start-first-step').on 'click', ->
-    socketIo.emit 'start step1'
+    socketIo.emit 'start step1', null, ->
+      statusPopup.showSuccessPopup "First step is seccesfully started"
 
   FAIL_SYMBOL = '--'
 

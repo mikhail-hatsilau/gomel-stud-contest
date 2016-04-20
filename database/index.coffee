@@ -103,10 +103,6 @@ module.exports.firstStepResults = ->
   connection.query QUERY
 
 module.exports.commonResults = (userId) ->
-  # QUERY = "SELECT #{USERS_TABLE}.id as userId, #{USERS_TABLE}.firstName, #{USERS_TABLE}.lastName, " +
-  # "#{MARKS_TABLE}.task, #{MARKS_TABLE}.mark " +
-  # "FROM #{USERS_TABLE} LEFT JOIN #{MARKS_TABLE} ON #{USERS_TABLE}.id=#{MARKS_TABLE}.user_id AND #{MARKS_TABLE}.step = ? " +
-  # "WHERE #{USERS_TABLE}.role = (SELECT id FROM #{ROLES_TABLE} WHERE name = 'student');"
   QUERY = "SELECT * FROM #{MARKS_TABLE} WHERE user_id = ?"
   connection.query QUERY, [userId]
 
@@ -139,9 +135,13 @@ module.exports.updateActiveState = (userId, active) ->
   QUERY = "UPDATE #{USERS_TABLE} SET active = ? WHERE id = ?;"
   connection.query QUERY, [active, userId]
 
-module.exports.updateUser = (userId, username, firstName, lastName, roleId) ->
-  QUERY = "UPDATE #{USERS_TABLE} SET username = ?, firstName = ?, lastName = ?, role = ? WHERE id = ?;"
-  connection.query QUERY, [username, firstName, lastName, roleId, userId]
+module.exports.updateUser = (userId, username, password, firstName, lastName, roleId) ->
+  if not password
+    QUERY = "UPDATE #{USERS_TABLE} SET username = ?, firstName = ?, lastName = ?, role = ? WHERE id = ?;"
+    connection.query QUERY, [username, firstName, lastName, roleId, userId]
+  else
+    QUERY = "UPDATE #{USERS_TABLE} SET username = ?, password = ?, firstName = ?, lastName = ?, role = ? WHERE id = ?;"
+    connection.query QUERY, [username, password, firstName, lastName, roleId, userId]
 
 module.exports.getTasks = (stepId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE step_id = ?;"

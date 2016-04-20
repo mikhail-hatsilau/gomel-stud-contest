@@ -135,6 +135,9 @@ body
   margin: 0 auto
   position: relative
 
+.container-full
+  padding: 0 24px
+
 ul
   list-style: none
   padding: 0
@@ -665,6 +668,9 @@ h1
   >div
     display: inline-block
 
+#addUserPopup, #removeConfirmationDialog, #editUserPopup
+  display: none
+
 // Edit tasks page
 .task-info
   .common-info, .code-editor
@@ -696,6 +702,7 @@ h1
   background: white
   margin-bottom: 24px
   font-family: $font-family-source-sans-pro
+  min-width: $container-width
 
   >div
     padding: 0 12px
@@ -708,6 +715,7 @@ div.quiz-task-time
   padding-bottom: 12px
   font-size: 16px
   color: #576061
+  line-height: 1.5em
 
   >div
     display: inline-block
@@ -726,6 +734,12 @@ div.quiz-task-time
 
   input+span
     margin-left: 12px
+
+  .current-info
+    float: right
+    >div
+      display: inline-block
+      margin-left: 24px
 
 .quiz-btn
   border: none
@@ -809,6 +823,11 @@ label
 
 button
   cursor: pointer
+
+.container-full
+  .scrollable-table, .quiz-operations
+    margin-left: auto
+    margin-right: auto
 
 .scrollable-table
   border: 1px solid $editors-border-color
@@ -1115,3 +1134,17 @@ textarea
 
     span
       margin-left: 10px
+
+  .edit-mark
+    float: right
+
+    label
+      margin-right: 10px
+
+    input
+      width: 40px
+      padding: 8px
+      text-align: center
+      color: $heading-color
+      background: transparent
+      border: 1px solid $heading-color

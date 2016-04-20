@@ -30,17 +30,23 @@ module.exports.edit = (next) ->
   username = this.request.body.username
   firstName = this.request.body.firstName
   lastName = this.request.body.lastName
+  password = this.request.body.password
   roleId = this.request.body.role
   active = this.request.body.active is 'true'
 
-  yield db.updateUser userId, username, firstName, lastName, roleId
+  hashedPassword = undefined
+
+  if password
+    hashedPassword = User.getEncryptedPassword password
+
+  yield db.updateUser userId, username, hashedPassword, firstName, lastName, roleId
   roleResp = yield db.getRole roleId
   roleRows = roleResp[0]
   role = new Role roleRows[0].id, roleRows[0].name
 
   this.body =
     status: 'ok'
-    user: new User userId, username, firstName, lastName, active, role 
+    user: new User userId, username, firstName, lastName, active, role
 
 module.exports.activate = (next) ->
   active = this.request.body.active is 'true'
@@ -52,6 +58,6 @@ module.exports.activate = (next) ->
       message: 'Active state has been changed'
   catch error
     this.response.status = 500
-    this.body = 
+    this.body =
       status: 'error'
       message: 'Error occured while changing active state'

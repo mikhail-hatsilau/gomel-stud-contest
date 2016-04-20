@@ -5,7 +5,7 @@ block title
 
 block content
   .container
-    .user-task-info
+    .user-task-info(data-userid=userInfo.id, data-taskid=task.id)
       .name-of-user
         |User:
         span= userInfo.firstName + ' ' + userInfo.lastName
@@ -15,6 +15,9 @@ block content
       .time-spent-markup
         |Time spent:
         span= result.time
+      .edit-mark
+        label(for="mark") Mark:
+        input#mark(type="text", value=mark)
     .bar.clearfix
       .editors
         .editor#htmlEditor= result.htmlCode

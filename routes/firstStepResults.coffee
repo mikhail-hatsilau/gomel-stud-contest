@@ -74,9 +74,15 @@ module.exports.results = (next) ->
 
 module.exports.showMarkup = (next) ->
   userId = this.params.userId
-  taskNumber = this.params.taskNumber
+  taskId = this.params.taskId
 
-  resp = yield db.getFirstStepTaskResults userId, taskNumber
+  resp = yield db.getUserResults userId, taskId
+  mark = 0
+
+  if resp[0].length
+    mark = resp[0][0].mark
+
+  resp = yield db.getFirstStepTaskResults userId, taskId
   result = resp[0][0]
 
   resp = yield db.getUserById userId
@@ -109,5 +115,6 @@ module.exports.showMarkup = (next) ->
     task: task,
     userInfo: user,
     result: result,
+    mark: mark,
     contentClass: 'editor-page'
   }

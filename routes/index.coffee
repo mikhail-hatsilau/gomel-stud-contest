@@ -33,7 +33,7 @@ module.exports = (app) ->
   router.get '/saveFile/:userId/:taskId', checkAuth, adminAccess, require('./saveFile')
   router.get '/next/:task', checkAuth, require('./editor').next
   router.post '/saveTaskResults', checkAuth, require('./editor').save
-  router.get '/showMarkup/:userId/:taskNumber', checkAuth, adminAccess, require('./firstStepResults').showMarkup
+  router.get '/showMarkup/:userId/:taskId', checkAuth, adminAccess, require('./firstStepResults').showMarkup
   router.post '/activateUser', checkAuth, adminAccess, require('./actionsWithUser').activate
   router.post '/editUser', checkAuth, adminAccess, require('./actionsWithUser').edit
   router.get '/firstStepTasks', checkAuth, adminAccess, require('./tasks').getFirstStepTasks

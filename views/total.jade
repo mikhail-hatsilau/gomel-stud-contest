@@ -6,7 +6,11 @@ block title
 block content
   .container
     h1 Marks
-    .scrollable-table
+  .container-full
+    - var allTasksLength = 0
+    each step in steps
+      - allTasksLength += step.tasks.length + 1
+    .scrollable-table(style="max-width: #{110 * allTasksLength + 372}px;")
       div.scrollable
         table.total-results
           thead
@@ -15,7 +19,7 @@ block content
               - var tasksCount = 0
               each step in steps
                 - tasksCount += step.tasks.length
-                th(colspan=step.tasks.length + 1, style="width: #{150 * (step.tasks.length + 1)}px;")= step.name
+                th(colspan=step.tasks.length + 1, style="width: #{110 * (step.tasks.length + 1)}px;")= step.name
               th.sort(rowspan=2, data-col=tasksCount + steps.length + 1) Total
             tr
               -var colNumber = 0

@@ -6,7 +6,8 @@ block title
 block content
   .container
     h1 CSS Quiz results
-    .quiz-operations
+  .container-full
+    .quiz-operations(style="max-width: #{allTasks.length * 450 + 372}px;")
       .actions
         button.quiz-btn.init-quiz
           span.ico.ico-init
@@ -17,7 +18,6 @@ block content
         button.quiz-btn.stop-quiz-task(disabled=true)
           span.ico.ico-finish
           |Finish
-        //- button.mui-btn.mui-btn--primary.next-quiz-task(disabled=true) Next
         button.quiz-btn.clear-quiz-results
           span.ico.ico-clear
           |Clear the Results
@@ -25,28 +25,21 @@ block content
         label(for="time-limit") Set Time Limit
         input(type="text", id="time-limit" value=120, placeholder='Seconds')
         span seconds
-        .current-task Current task:
-          span
-        .admin-timer Time Spent
-          span 00:00 
-    .scrollable-table
+        .current-info
+          .current-task Current task:
+            span
+          .admin-timer Time Spent
+            span 00:00 
+  
+    .scrollable-table(style="max-width: #{allTasks.length * 450 + 372}px;")
       if (allTasks.length)
         div.scrollable
-          table.quiz-results(class=allTasks.length === 1 ? 'single' : '')
+          table.quiz-results
             thead
               tr
                 th Participant
                 each task in allTasks
                   th(colspan=3)= task.name
-                    //- div= task.name
-                    //- div
-                    //-   //- div(data-col= ++colNumber) Weight
-                    //-   //-   button.js-sort Sort
-                    //-   div(data-col= ++colNumber) Time
-                    //-     button.js-sort Sort
-                    //-   div(data-col= ++colNumber) Selector
-                    //-   div(data-col= ++colNumber) Length
-                    //-     button.js-sort Sort
                 th.sort(data-col= 3 * allTasks.length + 1, rowspan=2) Total
               tr
                 - var colNumber = 0
@@ -61,8 +54,6 @@ block content
                   td= user.firstName + ' ' + user.lastName
                   each task in allTasks
                     if user.tasks[task.id]
-                      //- td
-                      //-   span.sort-item= user.tasks[task.id].task.weight
                       td.time(data-taskid = task.id)
                         span.sort-item= user.tasks[task.id].time
                       td.selector(data-taskid = task.id, title = user.tasks[task.id].selector)= user.tasks[task.id].selector
@@ -77,3 +68,6 @@ block content
       else
         .tasks-empty
           | No active tasks
+
+  #removeConfirmationDialog
+    include ./includes/removeConfirmationPopup
