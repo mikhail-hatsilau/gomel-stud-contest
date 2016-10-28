@@ -1,4 +1,4 @@
-$ = require 'jquery'
+$ = window.jQuery = require 'jquery'
 _ = require 'lodash'
 require 'jquery-ui'
 statusPopup = require('./statusPopup')()
