@@ -126,10 +126,19 @@ module.exports.saveFirstStepResults = (userId, taskId, time, htmlCode, cssCode, 
   QUERY = "INSERT INTO #{FIRST_STEP_TABLE} (user_id, task, time, htmlCode, cssCode, path) VALUE (?,?,?,?,?,?);"
   connection.query QUERY, [userId, taskId, time, htmlCode, cssCode, path]
 
-module.exports.getFirstStepTaskResults = (userId, taskNumber) ->
+module.exports.updateFirstStepResult = (userId, taskId, time, htmlCode, cssCode) ->
+  QUERY = "UPDATE #{FIRST_STEP_TABLE} set htmlCode=?,cssCode=?,time=? WHERE user_id=? AND task=?;"
+  connection.query QUERY, [htmlCode, cssCode, time, userId, taskId]
+
+module.exports.getFirstStepTaskResults = (userId, taskId) ->
   QUERY = "SELECT * FROM #{FIRST_STEP_TABLE} " +
   "WHERE user_id = ? AND task = ?;"
-  connection.query QUERY, [userId, taskNumber]
+  connection.query QUERY, [userId, taskId]
+
+module.exports.getFirstStepResults = (userId) ->
+  QUERY = "SELECT * FROM #{FIRST_STEP_TABLE} " +
+      "WHERE user_id = ?"
+  connection.query QUERY, [userId]
 
 module.exports.updateActiveState = (userId, active) ->
   QUERY = "UPDATE #{USERS_TABLE} SET active = ? WHERE id = ?;"
@@ -194,11 +203,6 @@ module.exports.getActiveTaskByDisplayNumber = (displayNumber, stepId) ->
 module.exports.getTaskById = (taskId) ->
   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
   connection.query QUERY, [taskId]
-#
-# module.exports.getTaskByIdPromise = (taskId) ->
-#   QUERY = "SELECT * FROM #{TASKS_TABLE} WHERE id = ?;"
-#   co ->
-#     connection.query QUERY, [taskId]
 
 module.exports.updateFirstStepTask = (taskId, name, displayNumber, weight, htmlCode, cssCode, toDo) ->
   QUERY = "UPDATE #{TASKS_TABLE} SET name = ?, displayNumber = ?, weight = ?, htmlCode = ?, cssCode = ?, toDo = ? " +
@@ -222,22 +226,6 @@ module.exports.clearFirstStep = ->
   QUERY = "DELETE FROM #{FIRST_STEP_TABLE};"
   co ->
     yield connection.query QUERY
-# module.exports.getSettings = ->
-#   QUERY = "SELECT * FROM #{SETTINGS_TABLE};"
-#   connection.query QUERY
-
-# module.exports.getSettingsByName = (name) ->
-#   QUERY = "SELECT * FROM #{SETTINGS_TABLE} WHERE name = ?;"
-#   connection.query QUERY, [name]
-
-# module.exports.getSettingsByNameWithPromise = (name) ->
-#   QUERY = "SELECT * FROM #{SETTINGS_TABLE} WHERE name = ?;"
-#   co ->
-#     yield connection.query QUERY, [name]
-
-# module.exports.updateSettings = (name, value, active) ->
-#   QUERY = "UPDATE #{SETTINGS_TABLE} SET value = ?, active = ? WHERE name = ?;"
-#   connection.query QUERY, [value, active, name]
 
 module.exports.closeConnection = ->
   connection.end()

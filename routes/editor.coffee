@@ -1,6 +1,9 @@
+_ = require 'lodash'
 utils = require '../utils'
 db = require '../database'
 FirstStepTask = require '../models/firstStepTask'
+
+FIRST_STEP_ID = 1
 
 module.exports.get = (next) ->
   yield this.render 'editor', { contentClass: 'editor-page' }
@@ -11,44 +14,69 @@ module.exports.save = (next) ->
   htmlCode = this.request.body.htmlCode
   cssCode = this.request.body.cssCode
 
-  pathToFile = utils.getFilePath this.req.user.id, this.req.user.username, taskId
-  yield db.saveFirstStepResults this.req.user.id, taskId, time, htmlCode, cssCode, pathToFile
+  resp = yield db.getFirstStepTaskResults this.req.user.id, taskId
+  resultRows = resp[0]
+
+  if resultRows.length
+    yield db.updateFirstStepResult this.req.user.id, taskId, time, htmlCode, cssCode
+  else
+    pathToFile = utils.getFilePath this.req.user.id, this.req.user.username, taskId
+    yield db.saveFirstStepResults this.req.user.id, taskId, time, htmlCode, cssCode, pathToFile
 
   this.body = {
     status: 'ok'
   }
 
-module.exports.next = (next) ->
-  FIRST_STEP_ID = 1
-  taskNumber = parseInt this.params.task
-
-  resp = yield db.getActiveTaskByDisplayNumber taskNumber, FIRST_STEP_ID
+module.exports.init = () ->
+  resp = yield db.getActiveTasks FIRST_STEP_ID
   rows = resp[0]
 
   if not rows.length
     this.response.status = 404
     this.body =
       status: 'error'
-      message: 'No such task'
-    return
+      message: 'No tasks'
 
-  rows.sort (a, b) ->
-    a.displayNumber - b.displayNumber
+  rows = _.sortBy(rows, ['displayNumber']);
 
-  task = new FirstStepTask(
-    rows[0].id,
-    rows[0].name,
-    rows[0].displayNumber,
-    rows[0].weight,
-    rows[0].htmlCode,
-    rows[0].cssCode,
-    rows[0].toDo,
-    rows[0].active
-  )
+  this.body =
+    tasksIds: rows.map((task) -> task.id)
+
+module.exports.next = () ->
+  taskId = parseInt this.params.taskId
+
+  resp = yield db.getTaskById taskId
+  rows = resp[0]
+
+  task = _.merge({}, rows[0]);
+
+  resp = yield db.getFirstStepTaskResults(this.req.user.id, taskId)
+  resultRows = resp[0]
+
+  if resultRows.length
+    task.htmlCode = resultRows[0].htmlCode
+    task.cssCode = resultRows[0].cssCode
+    task.initTime = resultRows[0].time
 
   this.body =
     task: task
-    nextTaskExists: !!rows[1]
+
+module.exports.prev = () ->
+  taskId = parseInt this.params.taskId
+
+  resp = yield db.getFirstStepTaskResults this.req.user.id, taskId
+
+  taskResult = resp[0][0]
+
+  resp = yield db.getTaskById taskId
+
+  task = _.merge({}, resp[0][0])
+  task.htmlCode = taskResult.htmlCode
+  task.cssCode = taskResult.cssCode
+  task.initTime = taskResult.time
+
+  this.body =
+    task: task
 
 module.exports.passForm = (next) ->
   QUIZ_WAIT_TIME_OPTION = 'quizWaitingTime'

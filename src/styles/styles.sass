@@ -251,9 +251,20 @@ a.btn
   margin-left: 24px
   transition: background 0.5s
 
-.show-task, .next-task
+.show-task
   font-size: 16px
   padding: 12px 24px
+
+.taskButtons
+  button
+    font-size: 16px
+    padding: 12px 24px
+
+  button
+    margin-left: 20px
+
+.finish-button
+  display: none
 
 .controls
   height: 90px
@@ -537,7 +548,7 @@ h1
     margin: 24px
 
 // Task popup
-.ui-dialog.task
+.ui-dialog.task-dialog
   border: 1px solid $editors-border-color
 
   .ui-dialog-titlebar-close
@@ -574,6 +585,13 @@ h1
     font-family: $roboto-font-family
     color: $gray-color
     font-weight: 300
+
+// Count down dialog
+.count-down-dialog
+  text-align: center
+
+  .time-to-redirect
+    font-weight: bold
 
 // Popup
 .popup

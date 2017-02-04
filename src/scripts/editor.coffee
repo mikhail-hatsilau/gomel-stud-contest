@@ -1,4 +1,4 @@
-$ = require 'jquery'
+$ = window.jQuery = require 'jquery'
 require 'jquery-ui'
 ace = require 'brace'
 _ = require 'lodash'
@@ -6,7 +6,6 @@ require 'brace/mode/html'
 require 'brace/mode/css'
 require('./dividers')()
 
-codeRunner = $('.js-run')
 editor = $('.editor')
 time = 0
 intervalId = undefined
@@ -38,13 +37,67 @@ initTaskDialog = ->
     width: 824,
     resizable: false,
     draggable: false,
-    dialogClass: 'task'
+    dialogClass: 'task-dialog'
+  }
+
+initInfoDialog = ->
+  dialog = $('#info-dialog').dialog {
+    autoOpen: false,
+    modal: true,
+    width: 600,
+    resizable: false,
+    draggable: false,
+    dialogClass: 'redirect-info-dialog'
   }
 
 taskDialog = initTaskDialog()
+infoDialog = initInfoDialog();
 
-taskId = -1
-taskNumber = getLocalStorage('taskNumber') || 1
+tasks = []
+activeTask = getLocalStorage('activeTask')
+
+showOrHideNextButton = ->
+  $nextTaskButton = $('.next-task')
+  activeTaskIndex = tasks.indexOf activeTask
+  if tasks.length - 1 == activeTaskIndex
+    $nextTaskButton.hide()
+  else
+    $nextTaskButton.show()
+
+showOrHidePrevButton = ->
+  $prevTaskButton = $('.prev-task')
+  activeTaskIndex = tasks.indexOf(activeTask)
+  if activeTaskIndex == 0
+    $prevTaskButton.hide()
+  else
+    $prevTaskButton.show()
+
+showFinishButton = ->
+  $finishButton = $('.finish-button')
+  activeTaskIndex = tasks.indexOf(activeTask)
+  if tasks.length - 1 == activeTaskIndex
+    $finishButton.show()
+  else
+    $finishButton.hide()
+
+# Loads new task from the server
+loadTask =  (task) ->
+  $.get "/next/#{task}"
+    .done (resp) ->
+      activeTask = resp.task.id
+      setLocalStorage('activeTask', activeTask)
+      showTask(resp.task)
+    .fail (xhr) ->
+      console.log 'Error occured'
+
+
+init = ->
+  $.get "/initFirstStep"
+    .done (resp) ->
+      tasks = resp.tasksIds
+      loadTask(activeTask || tasks[0])
+    .fail (xhr) ->
+      console.log 'Error occured'
 
 savePage = ->
   $.ajax({
@@ -53,7 +106,7 @@ savePage = ->
     data: {
       htmlContent: editorHtml.getValue(),
       cssContent: editorCss.getValue(),
-      taskId: taskId
+      taskId: activeTask
     }
   }).done (resp) ->
     jsResult = $('.js-result')
@@ -72,6 +125,22 @@ savePage = ->
 editorHtml.on 'change', _.debounce(savePage, 2000)
 editorCss.on 'change', _.debounce(savePage, 2000)
 
+parseTime = (time) ->
+  minutes = parseInt time / 60
+  seconds = time - minutes * 60
+
+  if minutes < 10 then stringMinutes = "0#{minutes}" else stringMinutes = minutes
+  if seconds < 10 then stringSeconds = "0#{seconds}" else stringSeconds = seconds
+
+  stringMinutes + ':' + stringSeconds
+
+startTimer = (initTime) ->
+  time = getLocalStorage('firstStepStartTime') || initTime || 0
+  timer = $('.timer')
+  intervalId = setInterval(->
+    setLocalStorage 'firstStepStartTime', ++time
+    timer.text parseTime(time)
+  , 1000)
 
 # Fills editors and popup with new task information
 showTask = (task) ->
@@ -82,45 +151,19 @@ showTask = (task) ->
   toDoBlock = $('.to-do-section')
   toDoBlock.empty()
   toDoBlock.html task.toDo
-  $('.ui-dialog-title').text task.name
+  $('.task-dialog .ui-dialog-title').text task.name
   $('.js-result').attr 'src', ''
-  time = getLocalStorage('firstStepStartTime') || 0
-  timer = $('.timer')
-  intervalId = setInterval(->
-    setLocalStorage 'firstStepStartTime', ++time
-    timer.text parseTime(time)
-  , 1000)
 
-# Loads new task from the server
-loadTask = ->
-  $.get "/next/#{taskNumber}"
-    .done (resp) ->
-      nextTaskBtn = $('.next-task')
+  showOrHideNextButton()
+  showOrHidePrevButton()
+  showFinishButton()
 
-      if resp.nextTaskExists
-        nextTaskBtn.show()
-      else
-        nextTaskBtn.hide()
+  startTimer(task.initTime)
 
-      taskId = resp.task.id
-      taskNumber = resp.task.displayNumber
 
-      setLocalStorage 'taskNumber', taskNumber
-      taskNumber++
-
-      task =
-        htmlCode: resp.task.htmlCode
-        cssCode: resp.task.cssCode
-        toDo: resp.task.toDo
-        name: resp.task.name
-
-      showTask(task)
-    .fail (xhr) ->
-      console.log 'Error occured'
-
-saveTaskResults = () ->
+saveTaskResults = (taskToLoad) ->
   $.post '/saveTaskResults', {
-    taskId: taskId,
+    taskId: activeTask,
     time: time,
     htmlCode: editorHtml.getValue(),
     cssCode: editorCss.getValue()
@@ -129,60 +172,39 @@ saveTaskResults = () ->
       clearLocalStorageItem 'htmlCode'
       clearLocalStorageItem 'cssCode'
       clearLocalStorageItem 'firstStepStartTime'
+      clearLocalStorageItem 'activeTask'
       clearInterval intervalId
-      loadTask()
+
+      if taskToLoad
+        loadTask taskToLoad
     .error ->
       console.log 'Error while saving task results'
-      clearLocalStorageItem 'firstStepStartTime'
 
-parseTime = (time) ->
-  minutes = parseInt time / 60
-  seconds = time - minutes * 60
+countDown = () ->
+  $timeElement = $('.time-to-redirect')
+  time = 30
+  setInterval(() ->
+    $timeElement.text("#{time--} seconds");
 
-  if minutes < 10 then stringMinutes = "0#{minutes}" else stringMinutes = minutes
-  if seconds < 10 then stringSeconds = "0#{seconds}" else stringSeconds = seconds
+    if time == 0
+      location.replace '/'
+  , 1000)
 
-  stringMinutes + ':' + stringSeconds
-
-# Submitting user's form inside the frame
-submitFrameForm = (action) ->
-  that = this
-  $.ajax {
-    url: action,
-    method: 'POST',
-    data: $(this).serialize()
-  }
-    .done (resp) ->
-      # QUIZ_ROUTE = '/quiz'
-      waitTime = 30
-      body = $(that).parent 'body'
-      contentBlock = $('<div class="frame-info"/>')
-      timerElement = $('<div class="timer"/>')
-      contentBlock.append $('<div class="message" style="font-family: Helvetica, Arial;"/>').text(resp.message)
-      contentBlock.append timerElement
-      body.empty()
-      body.append contentBlock
-      saveTaskResults()
-      clearLocalStorageItem 'taskNumber'
-      timerElement.text parseTime(waitTime)
-      waitRedirectInterval = setInterval( ->
-        timerElement.text parseTime(--waitTime)
-        if waitTime is 0
-          clearInterval waitRedirectInterval
-          location.replace '/'
-      , 1000)
-
-    .error (xhr) ->
-      $(that).find('.error').remove()
-      for error in xhr.responseJSON
-        for own key, value of error
-          errorDiv = $('<div style="font-family: Helvetica, Arial;"/>').addClass 'error'
-          $(that).append errorDiv.text value
-
-loadTask()
+init()
 
 $('.next-task').on 'click', ->
+  activeTaskIndex = tasks.indexOf(activeTask);
+  saveTaskResults(tasks[activeTaskIndex + 1])
+
+$('.prev-task').on 'click', ->
+  activeTaskIndex = tasks.indexOf(activeTask);
+  saveTaskResults(tasks[activeTaskIndex - 1])
+
+$('.finish-button').on 'click', ->
   saveTaskResults()
+  $('.redirect-info-dialog .ui-dialog-title').text 'Finish'
+  infoDialog.dialog 'open'
+  countDown()
 
 $('.show-task').on 'click', ->
   taskDialog.dialog 'open'

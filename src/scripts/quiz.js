@@ -75,14 +75,6 @@ $(function (){
 		return result;
 	}
 
-	var hideHtmlBlock = function (){
-		$('.html-wrapper').css('left', '-2000px').css('top', '-300px').css('transform', 'rotate(-90deg) scale(2)');
-	};
-
-	var showHtmlBlock = function (){
-		$('.html-wrapper').css('left', '0').css('top', '0').css('transform', 'rotate(0) scale(1)');
-	};
-
 	function simpleTimer(block, timeLimit) {
 	    // var time = (+$(block).html().split(':')[0]) * 60 + (+$(block).html().split(':')[1]);
 	    var minutes = parseInt(timer / 60);

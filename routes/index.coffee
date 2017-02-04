@@ -31,7 +31,9 @@ module.exports = (app) ->
   router.get '/quizResults', checkAuth, adminAccess, require('./quizResults')
   router.get '/firstStepResults', checkAuth, adminAccess, require('./firstStepResults').results
   router.get '/saveFile/:userId/:taskId', checkAuth, adminAccess, require('./saveFile')
-  router.get '/next/:task', checkAuth, require('./editor').next
+  router.get '/next/:taskId', checkAuth, require('./editor').next
+  router.get '/prev/:taskId', checkAuth, require('./editor').prev
+  router.get '/initFirstStep', checkAuth, require('./editor').init
   router.post '/saveTaskResults', checkAuth, require('./editor').save
   router.get '/showMarkup/:userId/:taskId', checkAuth, adminAccess, require('./firstStepResults').showMarkup
   router.post '/activateUser', checkAuth, adminAccess, require('./actionsWithUser').activate

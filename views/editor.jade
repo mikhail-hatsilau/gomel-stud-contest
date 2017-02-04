@@ -7,8 +7,11 @@ block content
   .container
     .controls.clearfix
       button.btn-dark-blue.show-task Show task
-      .timer  
-      button.btn-light-blue.right.next-task Next task
+      .timer
+      .taskButtons.right
+        button.btn-light-blue.prev-task Prev task
+        button.btn-light-blue.next-task Next task
+        button.btn-light-blue.finish-button Finish
     .bar.clearfix
       .editors
         .editor#editorHtml
@@ -22,6 +25,8 @@ block content
           sandbox="allow-forms allow-same-origin allow-scripts")
   #task-dialog.popup
     include ./includes/taskPopup
+  #info-dialog
+    include ./includes/countDownPopup
 
 block scripts
   script(src='scripts/editor.js')
